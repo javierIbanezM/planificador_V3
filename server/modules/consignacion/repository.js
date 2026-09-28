@@ -58,7 +58,7 @@ class ConsignacionRepository extends Repository {
                     COUNT(bulto) as bultos
               FROM [Planificador].[dbo].[planigrid_cdmuelles]
               where idplanigrid = pg.id
-              GROUP BY idplanigrid), CASE WHEN pg.[in-out] = 'IN' THEN '' ELSE ' / ' END, SUM(epc.bultos))
+              GROUP BY idplanigrid), CASE WHEN pg.[in-out] = 'IN' THEN '' ELSE ' / ' END, SUM(ISNULL(NULLIF(epc.palets, 0), epc.bultos)))
             as bultos,
             ecd.Estado as estadocdmuelles
             FROM planigrid AS pg
@@ -95,7 +95,7 @@ class ConsignacionRepository extends Repository {
             WHEN estado = 15 THEN 'Bloqueado'
             ELSE 'En Proceso' END as 'estado',
             playa,
-            CAST((ISNULL(COUNT(pcd.bulto),'')) as varchar)+'/'+CAST(ISNULL(bultos, '') as varchar) as bultos,
+            CAST((ISNULL(COUNT(pcd.bulto),'')) as varchar)+'/'+CAST(ISNULL(ISNULL(NULLIF(palets, 0), bultos), '') as varchar) as bultos,
             CASE
             WHEN [numSerieExpedicion] IS NULL THEN '0'
             ELSE [numSerieExpedicion] END as albaranenvio,
@@ -112,6 +112,7 @@ class ConsignacionRepository extends Repository {
             exp.estado,
             exp.playa,
             exp.bultos,
+            exp.palets,
             exp.numSerieExpedicion,
             exp.peligrosidad
 

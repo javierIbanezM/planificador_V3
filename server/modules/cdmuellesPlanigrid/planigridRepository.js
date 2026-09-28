@@ -220,8 +220,8 @@ class PlanigridCdRepository extends Repository {
         END as albaran,
         CASE
             WHEN pg.[in-out] = 'IN' THEN NULL
-            WHEN pg.agrupacion IS NOT NULL AND pg.[in-out] = 'OUT' THEN exp.bultos
-            WHEN pg.[in-out] = 'OUT' THEN bultos
+            WHEN pg.agrupacion IS NOT NULL AND pg.[in-out] = 'OUT' THEN ISNULL(NULLIF(exp.palets, 0), exp.bultos)
+            WHEN pg.[in-out] = 'OUT' THEN ISNULL(NULLIF(palets, 0), bultos)
         END bultos,
         MAX(pcd.bulto) AS bultoscargados,
         pg.id as idplanigrid,
@@ -236,7 +236,7 @@ class PlanigridCdRepository extends Repository {
             OR (pg.id = pcd.idplanigrid AND (pre.albaran = pcd.pedidoalbaran OR exp.pedido = pcd.pedidoalbaran))
     WHERE pg.id = ?
     AND (exp.estado IS NULL OR exp.estado NOT IN (-3, 9))
-    GROUP BY pg.agrupacion, pg.consignacion, pg.[in-out], pg.id, pg.estadocdmuelles, pre.albaran, exp.bultos, EXP.pedido`;
+    GROUP BY pg.agrupacion, pg.consignacion, pg.[in-out], pg.id, pg.estadocdmuelles, pre.albaran, exp.bultos, exp.palets, EXP.pedido`;
 
     return this.fetchAll(sqlText, [id]);
   }

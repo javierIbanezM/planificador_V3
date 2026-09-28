@@ -1,15 +1,10 @@
 ﻿Planificador (Node) escuchando en http://localhost:8011
-node : (node:5812) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 
+node : (node:4300) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 
 6066. This will be ignored in a future version.
 En línea: 1 Carácter: 377
 + ... cador v3-node"; $env:PORT=8011; node server\server.js *> node-out.log
 +                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ((node:5812) [DE...future version.:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: ((node:4300) [DE...future version.:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
 (Use `node --trace-deprecation ...` to show where the warning was created)
-Error SQL en ConsignacionRepository: SQL Server bloqueó el acceso a procedimiento 'dbo.sp_send_dbmail' del componente 
-'Database Mail XPs' porque este componente está desactivado como parte de la configuración de seguridad de este 
-servidor. Un administrador del sistema puede habilitar el uso de 'Database Mail XPs' mediante sp_configure. Para 
-obtener más información acerca de cómo habilitar 'Database Mail XPs', busque 'Database Mail XPs' en los Libros en 
-pantalla de SQL Server.
