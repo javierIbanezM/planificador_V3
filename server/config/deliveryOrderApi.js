@@ -9,7 +9,7 @@ const path = require('path');
  * albarán. El token es por propietario y vive fuera del repo, en
  * delivery-order-tokens.json (gitignored) en la raíz del proyecto.
  */
-const BASE_URL = 'http://192.168.2.21:8085/api/v3/deliveryOrder';
+const BASE_URL = 'MiddlewareWS.zar.local:8085/api/v3/deliveryOrder';
 const RAIZ_PROYECTO = path.resolve(__dirname, '..', '..');
 
 function tokens() {

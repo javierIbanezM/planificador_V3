@@ -17,7 +17,7 @@ use App\Config\Database;
  */
 final class ImpresionController
 {
-    private const URL_BASE_INFORMES = 'http://192.168.2.20/Planificador/Informes';
+    private const URL_BASE_INFORMES = 'ServidorWebs.zar.local/Planificador/Informes';
     private const NODE_PRINT_ENGINE = 'C:\\node_projects\\pdfPrintEngine\\app.js';
     private const IMPRESORA_POR_DEFECTO = 'WP08';
 

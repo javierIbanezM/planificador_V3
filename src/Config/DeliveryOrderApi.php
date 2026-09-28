@@ -15,7 +15,7 @@ use RuntimeException;
  */
 final class DeliveryOrderApi
 {
-    private const BASE_URL = 'http://192.168.2.21:8085/api/v3/deliveryOrder';
+    private const BASE_URL = 'MiddlewareWS.zar.local:8085/api/v3/deliveryOrder';
 
     /** @return array<string, string> */
     private static function tokens(): array

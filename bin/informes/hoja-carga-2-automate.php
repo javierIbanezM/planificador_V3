@@ -71,7 +71,7 @@ foreach ($datosAgrupados as $id => $data) {
     $filename = $data['ruta'] . $data['nombrefichero'];
     $pdf->Output($filename, 'F');
 
-    $rutaCarga = "\\\\192.168.2.2\\TRAZAL_documentacion\\{$data['propietario']}\\pedidos\\carga\\{$data['nombrefichero']}";
+    $rutaCarga = "\\\\AZA-SRV-FTPNEW.zar.local\\TRAZAL_documentacion\\{$data['propietario']}\\pedidos\\carga\\{$data['nombrefichero']}";
 
     foreach ($data['pedidos'] as $pedido) {
         $stmtCheck = $db->prepare('SELECT COUNT(*) AS total FROM PartnerWeb_v2.dbo.docsPedidos WHERE pedido = ? and propietario = ?');

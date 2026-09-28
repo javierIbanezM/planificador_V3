@@ -7,7 +7,7 @@ const ImpresionRepository = require('./impresionRepository');
 
 const execFileAsync = util.promisify(execFile);
 
-const URL_BASE_INFORMES = 'http://192.168.2.20/Planificador/Informes';
+const URL_BASE_INFORMES = 'ServidorWebs.zar.local/Planificador/Informes';
 const NODE_PRINT_ENGINE = 'C:\\node_projects\\pdfPrintEngine\\app.js';
 const IMPRESORA_POR_DEFECTO = 'WP08';
 

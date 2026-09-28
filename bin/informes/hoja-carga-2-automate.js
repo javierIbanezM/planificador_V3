@@ -64,7 +64,7 @@ async function main() {
     const filename = path.join(data.ruta, data.nombrefichero);
     fs.writeFileSync(filename, buffer);
 
-    const rutaCarga = `\\\\192.168.2.2\\TRAZAL_documentacion\\${data.propietario}\\pedidos\\carga\\${data.nombrefichero}`;
+    const rutaCarga = `\\\\AZA-SRV-FTPNEW.zar.local\\TRAZAL_documentacion\\${data.propietario}\\pedidos\\carga\\${data.nombrefichero}`;
 
     for (const pedido of data.pedidos) {
       // eslint-disable-next-line no-await-in-loop
