@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Etiqueta ROTIN Identificativa Logistics</title>
+<style>
+  @page { size: 105mm 148mm; margin: 4mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #000; margin: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 1px 2px; vertical-align: middle; }
+  .etiqueta { padding: 2mm; position: relative; }
+  .cabecera td { border: 1px solid #000; font-size: 8px; padding: 2px; }
+  .titulo-cabecera { color: #477CD0; text-align: center; font-size: 11px; margin: 2px 0; }
+  .atencion-fila { display: flex; align-items: center; justify-content: center; gap: 4mm; margin: 6px 0 2px; }
+  .atencion-fila img { width: 17mm; flex: 0 0 auto; }
+  .atencion-titulo { text-align: center; font-size: 22px; font-weight: bold; flex: 0 0 auto; }
+  .bloquear { text-align: center; margin-bottom: 4px; }
+  .rotin-caja {
+    background-color: #c1c1c1;
+    border: 3px solid #000;
+    text-align: center;
+    padding: 6px 2px;
+    margin-top: 10mm;
+  }
+  .rotin-texto { font-size: 42px; font-weight: bold; letter-spacing: 2px; }
+  .rotin-datos { font-size: 11px; text-align: left; padding: 0 6px; }
+  .footer-txt { text-align: center; font-size: 9px; margin-top: 6px; }
+  .footer-txt-sub { text-align: center; font-size: 8px; }
+</style>
+</head>
+<body>
+<div class="etiqueta">
+  <table class="cabecera">
+    <tr>
+      <td rowspan="3" style="width:22%"><img src="<%= imagenes.logo %>" style="width:100%" alt="Logo"></td>
+      <td rowspan="3"><div class="titulo-cabecera">ETIQUETA ROTIN PLANIFICADOR</div></td>
+      <td style="width:16%">ED: 01</td>
+    </tr>
+    <tr><td>COD: PSGC-03-ERP</td></tr>
+    <tr><td>Elaborado por Andrés Sánchez / IT</td></tr>
+  </table>
+
+  <div class="atencion-fila">
+    <img src="<%= imagenes.exclamacion %>" alt="Exclamación">
+    <div class="atencion-titulo">¡ATENCIÓN!</div>
+    <img src="<%= imagenes.exclamacion %>" alt="Exclamación">
+  </div>
+  <div class="bloquear">BLOQUEAR ESTE BULTO EN LA RECEPCIÓN</div>
+
+  <div class="rotin-caja">
+    <div class="rotin-texto">ROTIN</div>
+    <div class="rotin-datos">Propietario: <%= propietario %></div>
+    <div class="rotin-datos">Referencia: <%= referencia %></div>
+  </div>
+
+  <div class="footer-txt">- Coloca una etiqueta en cada bulto dañado -</div>
+  <div class="footer-txt-sub">Imprime una etiqueta por cada bulto dañado que identifiques</div>
+</div>
+</body>
+</html>

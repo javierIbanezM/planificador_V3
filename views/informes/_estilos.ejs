@@ -1,0 +1,62 @@
+<style>
+  @page { margin: 12mm 10mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    color: #000;
+    margin: 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 4px;
+  }
+  td, th {
+    border: 1px solid #000;
+    padding: 6px 4px;
+    vertical-align: top;
+  }
+  table.sin-borde td, table.sin-borde th {
+    border: none;
+  }
+  .bg-gris { background-color: #D0CECE; }
+  .bg-azul { background-color: #B4C6E7; }
+  .center { text-align: center; }
+  .justify { text-align: justify; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  .azul { color: #477CD0; }
+  h1.titulo {
+    text-align: center;
+    margin: 2px 0;
+    font-size: 16px;
+  }
+  .marca-agua {
+    position: fixed;
+    top: 35%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    opacity: 0.25;
+    z-index: -1;
+  }
+  .marca-agua img { width: 90%; }
+  .cabecera-doc td { font-size: 9px; }
+  /* Réplica del original: título (MultiCell) y foto van AMBOS con el mismo
+     ancho (150mm), centrados como bloque en la página, con el texto del
+     título alineado a la izquierda DENTRO de ese bloque (no centrado en
+     toda la página). Se centra el contenedor con text-align:center +
+     inline-block en vez de margin:auto (que aquí no centraba el título). */
+  .galeria-item { text-align: center; margin-bottom: 12px; }
+  .foto {
+    display: inline-block;
+    width: 150mm;
+    max-width: 100%;
+    max-height: 90mm;
+  }
+  .foto-titulo { display: inline-block; width: 150mm; max-width: 100%; margin: 4px 0 0; text-align: left; font-weight: bold; font-size: 12px; }
+  .pagina-galeria { page-break-before: always; padding-top: 10mm; }
+  .firma-img { max-width: 90mm; max-height: 14mm; }
+  .aviso { font-weight: bold; margin: 4px 0 8px; }
+</style>

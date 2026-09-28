@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Hoja de Descarga AZA Logistics</title>
+<%- include('_estilos') %>
+<style>
+  /* Bloque "Propietario/Albarán" + datos del chofer: réplica de los anchos
+     por fila del original TCPDF (HojaDescarga1Renderer.php), que NO son una
+     tabla HTML estándar con columnas compartidas entre filas — cada fila
+     fija su propio ancho de "columna" de etiqueta, así el texto largo
+     (LUGAR DE LA CARGA, NATURALEZA DE LA MERCANCÍA, etc.) no se parte en
+     tantas líneas como con una columna común. Se replica con filas flex en
+     vez de <table> para poder variar el ancho por fila. */
+  .tabla-chofer { border-top: 1px solid #000; border-left: 1px solid #000; margin-bottom: 4px; }
+  .tabla-chofer .fila-top, .tabla-chofer .fila-interna { display: flex; }
+  .tabla-chofer .celda { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 6px 4px; font-size: 9px; }
+
+  /* Cuadraditos de muestra de color junto a "Campo en Gris"/"Campo en
+     blanco" — en el PHP original son dos Rect() (8x3mm, relleno gris
+     #C0C0C0 y blanco) que faltaban por completo en el port. Van en su
+     propia columna de ancho fijo (no dentro del texto, que cambia de
+     longitud entre "Gris" y "blanco") para que las dos muestras queden
+     alineadas una encima de otra. */
+  /* Ancho de ~4 caracteres, a petición expresa (antes 14px). */
+  .muestra-color { display: inline-block; width: 32px; height: 8px; border: 1px solid #000; vertical-align: middle; }
+  .muestra-gris { background-color: #C0C0C0; }
+  .muestra-blanco { background-color: #fff; }
+
+  /* Cabecera en flex en vez de <table>+rowspan: con rowspan, el navegador
+     reparte el alto extra que necesita el <h1> (rowspan=3) entre las filas
+     de COD/ED/Fecha/Elaborado de forma poco predecible (deja un hueco justo
+     debajo de "ED: 05"). En flex cada fila de datos tiene su alto propio,
+     sin depender del alto del título. */
+  .cabecera-doc { display: flex; border: 1px solid #000; margin-bottom: 2px; }
+  .cabecera-doc .celda-logo,
+  .cabecera-doc .celda-titulo { flex: 0 0 33.33%; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .cabecera-doc .celda-datos { flex: 0 0 33.33%; display: flex; flex-direction: column; justify-content: center; }
+  .cabecera-doc .celda-datos .fila-dato { padding: 0 4px; line-height: 1.6; border-bottom: 1px solid #000; }
+  .cabecera-doc .celda-datos .fila-dato:last-child { border-bottom: none; }
+  .cabecera-doc h1.titulo { margin: 0; font-size: 15px; }
+
+  /* Leyenda "Campo en Gris"/"Campo en blanco": filas más juntas. */
+  .leyenda td { padding: 0 4px; }
+
+  /* CHOFER/DRIVER y VEHICULO/VEHICLE: franja vertical a la izquierda de
+     cada bloque, réplica de los PNG originales (chdriver.png/vehicle.png,
+     ya cargados en `imagenes` pero sin usar en el port). La imagen va en
+     position:absolute para que NO participe en el cálculo de alto de la
+     fila flex — si no, su proporción vertical (angosta y muy alta) fuerza
+     que toda la fila se estire para darle sitio, dejando un hueco enorme. */
+  .franja-vertical { padding: 0 !important; text-align: center; position: relative; overflow: hidden; }
+
+  .franja-vertical img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+
+  /* Tabla de vehículo: igual que la de chofer, cada fila del PHP original
+     tiene su propio ancho de columna (no son iguales entre la fila de
+     matrículas y las de temperatura), así que va con filas flex en vez de
+     <table> con un único ancho de columna compartido. El padding vertical
+     8px (en vez de los 3px de chofer) da más alto real de fila: el bloque
+     de vehículo tiene menos filas que el de chofer, y sin ese alto extra
+     "VEHICULO/VEHICLE" salía mucho más pequeño al encogerse
+     (object-fit:contain) a un hueco corto. */
+  .tabla-vehiculo { border-top: 1px solid #000; border-left: 1px solid #000; margin-bottom: 4px; }
+  .tabla-vehiculo .fila-interna { display: flex; }
+  .tabla-vehiculo .celda { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px 4px; font-size: 9px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <% if (!finalizada) { %>
+  <div class="marca-agua"><img src="<%= imagenes.marcaDeAgua %>" alt="No finalizado"></div>
+  <% } %>
+
+  <div class="cabecera-doc">
+    <div class="celda-logo"><img src="<%= imagenes.logo %>" style="width:48mm" alt="Logo AZA Logistics"></div>
+    <div class="celda-titulo"><h1 class="titulo" style="color:#477CD0">HOJA DE DESCARGA</h1></div>
+    <div class="celda-datos">
+      <div class="fila-dato">COD: PSGC-03-F01</div>
+      <div class="fila-dato">ED: 05</div>
+      <div class="fila-dato">Fecha: <%= fecha %></div>
+      <div class="fila-dato">Elaborado por Andrés Sánchez / IT</div>
+    </div>
+  </div>
+
+  <table class="sin-borde leyenda">
+    <tr>
+      <td style="width:14%"><strong>Campo en Gris</strong></td>
+      <td style="width:36px"><span class="muestra-color muestra-gris"></span></td>
+      <td style="width:20%">Rellenado por centralita / ROC</td>
+      <td style="width:6%"></td>
+      <td rowspan="2" style="width:11%;padding-right:1px;vertical-align:middle">Nº Muelle<br>Asignado:</td>
+      <td rowspan="2" class="bg-gris" style="width:8%;border:1px solid #000;padding-left:1px;vertical-align:middle"><%= muelle %></td>
+      <td style="width:4%"></td>
+      <td rowspan="2" style="width:11%;padding-right:1px;vertical-align:middle">FECHA DE LA<br>DESCARGA:</td>
+      <td rowspan="2" class="bg-gris" style="border:1px solid #000;padding-left:1px;vertical-align:middle"><%= fechaCarga %></td>
+    </tr>
+    <tr>
+      <td><strong>Campo en blanco</strong></td>
+      <td><span class="muestra-color muestra-blanco"></span></td>
+      <td>Rellenado por Operario</td>
+    </tr>
+  </table>
+
+  <div class="tabla-chofer">
+    <div class="fila-top">
+      <div class="celda bg-azul center bold" style="flex:0 0 31.3%">Propietario/Albarán:</div>
+      <div class="celda bg-gris" style="flex:0 0 39.0%"><%= propietario %> / <%= albaran %></div>
+      <div class="celda bg-gris center" style="flex:0 0 8.6%">Precinto:</div>
+      <div class="celda bg-gris" style="flex:0 0 21.1%"><%= precinto %></div>
+    </div>
+    <div class="fila-interna">
+      <div class="celda bg-gris franja-vertical" style="flex:0 0 7.0%"><img src="<%= imagenes.chdriver %>" alt="CHOFER/DRIVER"></div>
+      <div style="flex:1">
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:1;border-right:none">NOMBRE Y APELLIDOS/NAME AND SURNAMES: <%= nombre %> <%= apellidos %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:1;border-right:none">&nbsp;</div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 6.7%;border-right:none">DNI/ID:</div>
+          <div class="celda bg-gris" style="flex:0 0 43.7%"><%= dni %></div>
+          <div class="celda bg-gris" style="flex:0 0 21.0%;border-right:none">LUGAR DE LA CARGA: (Población almacén AZAL)</div>
+          <div class="celda bg-gris" style="flex:0 0 28.6%"><%= poblacion %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 16.8%;border-right:none">TELEFONO/PHONE:</div>
+          <div class="celda bg-gris" style="flex:0 0 33.6%"><%= telefono %></div>
+          <div class="celda bg-gris" style="flex:0 0 21.0%;border-right:none">NATURALEZA DE LA MERCANCÍA (opcional):</div>
+          <div class="celda bg-gris" style="flex:0 0 28.6%"></div>
+        </div>
+        <div class="fila-interna">
+          <div style="flex:0 0 50.4%">
+            <div class="fila-interna">
+              <div class="celda bg-gris" style="flex:0 0 55.0%">POBLACIÓN Ó PAÍS DE ORIGEN:<br><span class="azul">CITY OR COUNTRY OF ORIGIN:</span></div>
+              <div class="celda bg-gris" style="flex:0 0 45.0%">Pais de Proveedor Whales</div>
+            </div>
+            <div class="fila-interna">
+              <div class="celda bg-gris" style="flex:0 0 48.3%;border-right:none">EMPRESA DE TRANSPORTE: TRANSPORT AGENCY:</div>
+              <div class="celda bg-gris" style="flex:0 0 51.7%"><%= transportista %></div>
+            </div>
+          </div>
+          <div class="celda bg-gris" style="flex:0 0 30.3%;display:flex;align-items:center">Relativo a Aduanas. ¿Mercancía a DA o DDA?:</div>
+          <div class="celda bg-gris center" style="flex:0 0 19.3%;display:flex;align-items:center;justify-content:center"><%= da %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris center" style="flex:0 0 16.0%;border-right:none">Nº DE PRECINTO (Ver Documentación):</div>
+          <div class="celda bg-gris" style="flex:0 0 34.4%"><%= precinto %></div>
+          <div class="celda" style="flex:0 0 37.0%">El Nº Precinto (Documentación) COINCIDE CON EL DEL CONTENEDOR?:</div>
+          <div class="celda" style="flex:0 0 12.6%"><%= precinto %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabla-vehiculo">
+    <div class="fila-interna">
+      <div class="celda bg-gris franja-vertical" style="flex:0 0 7.0%"><img src="<%= imagenes.vehicle %>" alt="VEHICULO/VEHICLE"></div>
+      <div style="flex:1">
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 25.2%;border-right:none">MATRÍCULA VEHÍCULO<br><span class="azul">VEHICLE PLATE:</span></div>
+          <div class="celda bg-gris" style="flex:0 0 19.4%"><%= matriculatractora %></div>
+          <div class="celda bg-gris" style="flex:0 0 21.5%">MATRÍCULA REMOLQUE<br><span class="azul">TRAILER PLATE:</span></div>
+          <!-- Ensanchada respecto al 14.1% del PHP original, a petición
+               expresa (se rellena con un string y necesita más sitio). Las 4
+               celdas de esta fila deben sumar 100% del ancho del contenedor
+               flex:1 (no de los 640 "px" del PHP, que incluyen la columna de
+               la franja vertical aparte) — si no, la última celda se queda
+               corta y no llega hasta el borde derecho. -->
+          <div class="celda bg-gris" style="flex:0 0 33.9%"><%= matricularemolque %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 52.1%">¿VEHÍCULO CONTRATADO A TEMPERATURA CONTROLADA?:</div>
+          <div class="celda bg-gris azul center" style="flex:0 0 3.3%"><%= temp %></div>
+          <div class="celda bg-gris azul" style="flex:0 0 26.9%">TEMPERATURA CONTRATADA:</div>
+          <div class="celda bg-gris azul center" style="flex:0 0 17.7%"><%= rango %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda" style="flex:0 0 52.1%">¿TEMPERATURA VEHÍCULO COINCIDE CON LA CONTRATADA?:</div>
+          <div class="celda azul center" style="flex:0 0 3.3%"><%= comparaciontemp %></div>
+          <div class="celda azul" style="flex:0 0 26.9%">TEMPERATURA MEDIDA ºC:</div>
+          <div class="celda azul center" style="flex:0 0 17.7%"><%= tempmedida %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('_checksCalidad', { checks, observacion, verboCompatible: 'descargar' }) %>
+
+  <table style="table-layout:fixed">
+    <colgroup>
+      <col style="width:58.6%">
+      <col style="width:41.4%">
+    </colgroup>
+    <tr>
+      <td class="center bold">USUARIOS INVOLUCRADOS EN LA DESCARGA</td>
+      <td class="center bold">TIEMPO DE DESCARGA</td>
+    </tr>
+    <tr>
+      <td rowspan="2" class="bold"><%= operarios %></td>
+      <td class="right">Hora de Inicio: <%= fechainicio %></td>
+    </tr>
+    <tr>
+      <td class="right">Hora Final: <%= fechafincd %></td>
+    </tr>
+  </table>
+
+  <table class="sin-borde" style="table-layout:fixed">
+    <colgroup>
+      <col style="width:23.4%">
+      <col style="width:21.9%">
+      <col style="width:15.6%">
+      <col style="width:15.6%">
+      <col style="width:23.4%">
+    </colgroup>
+    <tr>
+      <td></td>
+      <td colspan="3" class="center bold" style="border:1px solid #000">Nº de Bultos</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="center bold" style="border:1px solid #000">Recuentos</td>
+      <td class="bg-gris center bold" style="border:1px solid #000">Bultos Esperados</td>
+      <td class="center bold" style="border:1px solid #000">Bultos descargados</td>
+      <td></td>
+    </tr>
+    <% bultosRows.forEach((fila) => { %>
+    <tr>
+      <td></td>
+      <td class="center" style="border:1px solid #000"><%= fila.albaran %></td>
+      <td class="bg-gris center" style="border:1px solid #000">No Definido</td>
+      <td class="center" style="border:1px solid #000"></td>
+      <td></td>
+    </tr>
+    <% }) %>
+    <tr>
+      <td></td>
+      <td class="center bold" style="border:1px solid #000">Totales</td>
+      <td class="bg-gris center" style="border:1px solid #000">No Definido</td>
+      <td class="center" style="border:1px solid #000"><%= bultostotales %></td>
+      <td></td>
+    </tr>
+  </table>
+
+  <% if (adrLq) { %>
+  <%- include('_adrLq', { adrLq }) %>
+  <% } %>
+
+</div>
+
+<%- include('_galeria', { galeria }) %>
+
+</body>
+</html>

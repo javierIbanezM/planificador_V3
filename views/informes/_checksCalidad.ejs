@@ -1,0 +1,68 @@
+<%
+/**
+ * Tabla "EN RELACIÓN A LA CARGA DE LA MERCANCÍA, CONTESTAR" + campo de
+ * observaciones. Réplica literal del bloque checksRows/mostrarobservacion de
+ * HojaCarga1Renderer/HojaCarga2Renderer/HojaDescarga1Renderer: cada fila es
+ * campohtml (pregunta) + value (respuesta SI/NO), y la primera fila lleva
+ * además la columna de observaciones con rowspan sobre el resto de filas.
+ *
+ * campohtml se pinta sin escapar (igual que el PHP original, que interpola
+ * el valor tal cual). Algunas preguntas de la base de datos arrastran
+ * controles de formulario sueltos (<input>, <textarea>, <select>, <button>;
+ * residuo de otro formulario que reutiliza el mismo campo). TCPDF los
+ * ignora al generar el PDF, pero un navegador sí los pinta como controles
+ * reales (cuadros con sombreado tipo "campo en blanco") — se quitan todos,
+ * no solo <input>, para que no aparezca ninguno de esos controles.
+ */
+function limpiarCampoHtml(html) {
+  return (html || '').replace(/<input\b[^>]*>/gi, '').replace(/<textarea\b[^>]*>[\s\S]*?<\/textarea\s*>/gi, '').replace(/<select\b[^>]*>[\s\S]*?<\/select\s*>/gi, '').replace(/<button\b[^>]*>[\s\S]*?<\/button\s*>/gi, '');
+}
+// La pregunta "¿La mercancia a cargar/descargar es compatible?" venía de la
+// base de datos con controles de formulario sueltos y una imagen mal
+// colocada (y a veces con el verbo "descargar" aunque sea una Hoja de
+// Carga, porque así está redactada en la BD); en vez de sanear ese HTML
+// fila a fila, se sustituye por un texto fijo y limpio con el verbo que
+// corresponda al documento (pasado por el caller), conservando el valor
+// SI/NO real de esa fila.
+function esCompatible(fila) {
+  return /compatible/i.test(fila.campohtml || '');
+}
+const verboCarga = typeof verboCompatible !== 'undefined' && verboCompatible ? verboCompatible : 'cargar';
+function textoFila(fila, indice) {
+  const original = fila.campohtml || '';
+  if (esCompatible(fila)) {
+    return `${indice + 1}. ¿La mercancia a ${verboCarga} es compatible?`;
+  }
+  return limpiarCampoHtml(original);
+}
+// mercanciaCompatible solo se pasa desde Hoja de Carga 1 y 2 (no desde
+// Descarga); si no llega, no se pinta ninguna imagen.
+const imgCompatible = typeof mercanciaCompatible !== 'undefined' ? mercanciaCompatible : null;
+%>
+<table style="table-layout:fixed">
+  <colgroup>
+    <col style="width:54.7%">
+    <col style="width:3.9%">
+    <col style="width:41.4%">
+  </colgroup>
+  <tr>
+    <td class="center bold" colspan="2">EN RELACIÓN A LA CARGA DE LA MERCANCÍA, CONTESTAR:</td>
+    <td class="center bold">CAMPO DE OBSERVACIONES</td>
+  </tr>
+  <% if (checks.length === 0) { %>
+  <tr>
+    <td colspan="2"></td>
+    <td><%= observacion %></td>
+  </tr>
+  <% } else { %>
+  <% checks.forEach((fila, indice) => { %>
+  <tr>
+    <td><div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span style="white-space:pre-line"><%- textoFila(fila, indice) %></span><% if (imgCompatible && esCompatible(fila)) { %><img src="<%= imgCompatible %>" style="width:135px;height:25px;flex:0 0 auto" alt="Mercancía compatible"><% } %></div></td>
+    <td class="center azul"><%= fila.value || '' %></td>
+    <% if (indice === 0) { %>
+    <td rowspan="<%= checks.length %>"><%= observacion %></td>
+    <% } %>
+  </tr>
+  <% }) %>
+  <% } %>
+</table>

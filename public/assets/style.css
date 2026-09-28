@@ -1,0 +1,278 @@
+/* Estilo para el contenido de la web*/
+.app-content {
+    /* 
+    Lo definimos así para evitar que los elementos de las tablas
+    de pedidos y preavisos desborden 
+    */
+    min-width: 768px;
+}
+/* ******************************* */
+
+.app-title-description {
+    background-color: #aaaaaa;
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Estilo para el avatar de usuario */
+.app-sidebar__user-avatar{
+    width: 48px;
+    background: gray;
+    padding: 6px;
+}
+/* ******************************* */
+
+/* WIP: cambiar en main.css y, después, eliminar este estilo */ 
+.app-header__logo{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+/* ********************************************************* */
+
+/* Estilos para los encabezados de las ventanas modales */
+.headerRegister, .header-primary{
+    background-color: #009688;
+    color: #FFF;
+}
+
+.headerUpdate{
+    background-color: #007bff;
+    color: #FFF;
+}
+/* ***************************************************** */
+
+/* Estilos para el formulario de Login a la app */
+.login-form-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.logo p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: right;
+    font-style: italic;
+}
+/* ******************************************** /
+
+/*  Estilos para la imagen de loading del formulario de contacto  */
+.loading-container{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    background: rgba(254,254,255,.65);
+    z-index: 1100;
+    display: none;
+}
+
+.loading-container img{
+    width: 50px;
+    height: 50%;
+}
+/* *************************************************************** */
+
+/*  Estilos para las columnas de la tabla Stocks  */
+.zero-stock {
+    color: salmon;
+}
+
+/* *************************************************************** */
+
+.hide {
+    display: none;
+}
+
+.not-active {
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    opacity: 0;
+}
+
+.hide_servido, .hide_recepcionado {
+    color:#E5E5E5 !important;
+}
+
+.celda_cantidad{
+    text-align: center;
+    width: 100px;
+}
+
+.change-alignment{
+    text-align: center;
+}
+
+.hide-headertext{
+    color: #6FA1DD !important;
+}
+
+.number-input {
+    padding:5px; 
+    box-sizing: border-box;
+    border: 3px solid rgba(114, 157, 216, 0.7);
+}
+
+.input_notvalidated {
+    border: 3px solid rgba(230, 90, 30, 0.7);
+}
+
+.input_validated {
+    border: 3px solid rgba(40, 160, 40, 0.7);
+}
+
+/* ########### VENTANA MODAL CONTROL XSS ########## */
+.modalContainer {
+    display: none; 
+    position: fixed; 
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modalContainer .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid lightgray;
+    border-top: 20px solid rgba(255, 127, 80, .8);
+    width: 60%;
+    transition: width 5s;
+}
+
+.modal-content h2{
+text-align: center;
+}
+
+.modal-content p{
+text-align: center;
+}
+
+.modalContainer .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modalContainer .close:hover,
+.modalContainer .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* ############################################### */
+
+/* ## TOOLTIPS INFORMATIVOS PARA INPUTS FORMULARIO CABECERA ## */
+.tooltip .tooltip-inner  {
+    background-color:    #31b0d5;
+    text-align: left;
+}
+.tooltip.bs-tooltip-right .arrow:before {
+    border-right-color: #31b0d5 !important;
+}
+.tooltip.bs-tooltip-left .arrow:before {
+    border-left-color: #31b0d5 !important;
+}
+.tooltip.bs-tooltip-bottom .arrow:before {
+    border-bottom-color: #31b0d5 !important;
+}
+.tooltip.bs-tooltip-top .arrow:before {
+    border-top-color: #31b0d5 !important;
+}
+/* ########################################################### */
+
+/* ## ICONOS INFORMATIVOS PARA INPUTS FORMULARIO CABECERA ## */
+.icon-input-info{
+    color: #31b0d5;
+    font-size: 0.8rem;
+}
+.icon-input-info2{
+    color: #68BC68;
+    font-size: 0.8rem;
+}
+/* ######################################################## */
+
+#scrollUp {
+    bottom: 20px;
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    color: #fff;
+    background: url('../images/top.png');
+}
+
+/*div[id="alert-notice-reembolso"]{
+    display:inline;
+}*/
+
+.col-notice {
+    display: none;
+}
+
+.col-notice-importe{
+    display: none;
+}
+
+.alert-notice-services{
+    color: rgba(230, 90, 30, 0.7);
+    font-size: 0.8rem;
+    margin-bottom: 1rem;;
+}
+
+.aviso_stock {
+    font-weight: 700;
+    background-color: rgba(255, 0, 0, 0.45);
+}
+
+.element-hide {
+    display:none !important;
+}
+
+/* ********************************** DATATABLES ******************************************* */
+/* Ocultamos el botón de búsqueda principal del las tablas DataTable*/
+.dataTables_filter{
+    display: none;
+}
+
+/* Aumentamos el margen inferior de la barra de botones de exportación de las tablas DataTable*/
+#tablePedidos_wrapper > div.dt-buttons{
+    margin-bottom: 1rem;
+}
+
+#tableStocks_wrapper > div.dt-buttons{
+    margin-bottom: 1rem;
+}
+/* ***************************************************************************************** */
+
+/* Modificamos estilos de hoja de estilos main.css para adaptarlos a nuestras necesidades */
+.custom-select {
+    /* Con esto conseguimos que el elemento select para el país se muestre con un borde verde inicialmente,
+    debido a que es un campo que ya está validado desde un inicio */
+    border: 3px solid rgba(40, 160, 40, 0.7); 
+}
+
+
+.map {
+    height: 350px;
+}
+
+.badge_seguimiento {
+    text-decoration: none;
+    color: white;
+    padding: 3px;
+}
+
+.badge_seguimiento:link, .badge_seguimiento:visited, .badge_seguimiento:active {
+    text-decoration:none;
+}
+
+
+.btn-clock-reload:active {
+    transform: scale(0.9);
+}

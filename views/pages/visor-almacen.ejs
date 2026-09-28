@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <title>Visor de Almacén - Planificador</title>
+  <%- include('../partials/head-main') %>
+
+  <style>
+.progress-circle {
+  width: 100px;
+  height: 100px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 10px auto;
+  max-width: 80%;
+  max-height: 16px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke: #4caf50;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0, 100;
+  }
+}
+    </style>
+</head>
+
+<body>
+<%- include('../partials/header-muelles') %>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-2" style="padding:0px 0px 0px 5px; max-width: fit-content;">
+        <div style="position: absolute; top: -5px; display: flex;">
+          <a href="#"><svg onclick="cambiarTablas()" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-back" style="color:white;">
+            <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+          </svg></a>
+          <svg id="closeAautoUpdate" onclick="toggleAutoUpdate()" xmlns="http://www.w3.org/2000/svg" style="color:red;margin: 0px;display:none" width="25" height="25" fill="currentColor" class="bi bi-x-circle">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+          </svg>
+          <a href="#"><svg id="progressSvg" onclick="toggleAutoUpdate()" style="color:white;margin: 0px" width="25" height="25" viewBox="0 0 36 36" class="circular-chart">
+            <path id="circlebg" class="circle-bg"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path id="circle" class="circle"
+                  stroke-dasharray="0, 100"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg></a>
+        </div>
+        <div id="divconsignacionpreparadas">
+          <p style="text-align:center !important;margin-bottom:0px;margin-top: -10px;"><a style="font-size:18px"><strong>Consignaciones</strong></a> preparadas en espera
+            de transporte</p>
+          <div style="background-color:white;padding: 5px">
+            <table class="table table-light table-bordered dataTable">
+              <thead>
+                <tr role="row">
+                  <th>Propietario</th>
+                  <th>Consignación</th>
+                  <th>Estado</th>
+                  <th>Prevista</th>
+                  <th>Progr</th>
+                </tr>
+            </table>
+            <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+              <table class="table table-light table-bordered dataTable" id="table-preparado" role="grid">
+                <tbody id="tabla-consignacionespreparadas">
+                  <!-- Se escribe por script -->
+                </tbody>
+              </table>
+
+
+            </div>
+            <div style="text-align: right;">
+              <span>Registros en la tabla: </span><span id="contadorconsignacionespreparadas">0</span>
+            </div>
+        </div>
+      </div>
+      <div id="divpreavisossinrecep" style="display:none">
+          <p style="text-align:center !important;margin-bottom:0px;margin-top: -10px;"><a style="font-size:18px"><strong>Preavisos</strong></a> descargados sin recepcionar</p>
+          <div style="background-color:white;padding: 5px">
+            <table class="table table-light table-bordered dataTable">
+              <thead>
+                <tr role="row">
+                  <th>Propietario</th>
+                  <th>Albarán</th>
+                  <th>Ubicación</th>
+                  <th>Bultos</th>
+                  <th>Estado</th>
+                  <th>Finalizado</th>
+                  <th>Tiempo</th>
+                </tr>
+            </table>
+            <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+              <table class="table table-light table-bordered dataTable" id="table-preparado" role="grid">
+                <tbody id="tabla-preavisossinrecep">
+                  <!-- Se escribe por script -->
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align: right;">
+              <span>Registros en la tabla: </span><span id="contadorpreavisossinrecep">0</span>
+            </div>
+          </div>
+        </div>
+
+      <div id="divconsignacionnopreparadas">
+        <p style="text-align:center !important;margin-bottom:0px;"><a style="font-size:18px"><strong>Consignaciones</a> NO</strong>
+          preparadas que salen <strong>hoy</strong></p>
+        <div style="background-color:white;padding: 5px">
+          <table class="table table-light table-bordered dataTable">
+            <thead>
+              <tr role="row">
+                <th>Propietario</th>
+                <th>Consignación</th>
+                <th>Estado</th>
+                <th>Prevista</th>
+                <th>Progr</th>
+              </tr>
+          </table>
+
+          <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:30vh;">
+            <table class="table table-light table-bordered dataTable" id="table-no-preparado" role="grid">
+              <tbody id="tabla-consignacionesnopreparadas">
+                <!-- Se escribe por script -->
+              </tbody>
+            </table>
+          </div>
+          <div style="text-align: right;">
+              <span>Registros en la tabla: </span><span id="contadorconsignacionesnopreparadas">0</span>
+          </div>
+        </div>
+      </div>
+
+        <div id="divpreavporllegar" style="display:none">
+          <p style="text-align:center !important;margin-bottom:0px;"><a style="font-size:18px"><strong>Preavisos</strong></a> pendiente de llegada HOY</p>
+          <div style="background-color:white;padding: 5px">
+            <table class="table table-light table-bordered dataTable">
+              <thead>
+                <tr role="row">
+                  <th>Propietario</th>
+                  <th>Albarán</th>
+                  <th>Transportista</th>
+                  <th>Progr</th>
+                </tr>
+            </table>
+            <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+              <table class="table table-light table-bordered dataTable" id="table-preparado" role="grid">
+                <tbody id="tabla-preavisosporllegar">
+                  <!-- Se escribe por script -->
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align: right;">
+              <span>Registros en la tabla: </span><span id="contadorpreavisosporllegar">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col" style="padding: 5px 5px 0px 2.5px">
+        <p style="text-align:center !important;margin-bottom:0px;margin-top: -10px;">Cargas y descargas que se
+          encuentran en la nave</p>
+        <table class="table table-light table-bordered dataTable" class="tablaplaning">
+          <thead>
+            <tr role="row">
+              <th style="width: 3%;">Muelle</th>
+              <th style="width: 3%;">Playa</th>
+              <th style="width: 10%;">Propietario</th>
+              <th style="width: 20%;">Consignación</th>
+              <th style="width: 20%;">Observaciones</th>
+              <th style="width: 10%;">Transportista</th>
+              <th style="width: 3%;">Progr</th>
+              <th style="width: 3%;">Llegada</th>
+              <th style="width: 3%;">Asign</th>
+              <th style="width: 5%;">T. Carga</th>
+              <th style="width: 4%;">Estado</th>
+              <th style="width: 5%">EstadoCD</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-visoralmacencd">
+            <!-- Se escribe por script -->
+          </tbody>
+          <thead>
+            <tr role="row">
+              <th style="width: 3%;">Muelle</th>
+              <th style="width: 3%;">Playa</th>
+              <th style="width: 10%;">Propietario</th>
+              <th style="width: 20%;">Consignación</th>
+              <th style="width: 20%;">Observaciones</th>
+              <th style="width: 10%;">Transportista</th>
+              <th style="width: 3%;">Progr</th>
+              <th style="width: 3%;">Llegada</th>
+              <th style="width: 3%;">Asign</th>
+              <th style="width: 5%;">T. Carga</th>
+              <th style="width: 4%;">Estado</th>
+              <th style="width: 5%">EstadoCD</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <%- include('../modals/consignacion') %>
+    <%- include('../modals/muelles') %>
+    <%- include('../modals/muelles-cdsinmuelles') %>
+    <%- include('../modals/muelles-empezados') %>
+    <%- include('../modals/muelles-operario') %>
+    <%- include('../partials/footer') %>
+
+    <script src="<%= baseUrl %>assets/visor-almacen.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+<% if (galeria && galeria.length > 0) { %>
+<div class="pagina-galeria">
+  <h1 class="titulo">INFOGRAFÍAS</h1>
+  <% galeria.forEach((foto) => { %>
+  <div class="galeria-item">
+    <div class="foto-titulo"><%= foto.descripcion %></div>
+    <img class="foto" src="<%= foto.dataUri %>" alt="<%= foto.descripcion %>">
+  </div>
+  <% }) %>
+</div>
+<% } %>

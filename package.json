@@ -1,0 +1,24 @@
+{
+  "name": "azalogistics-planificador",
+  "version": "1.0.0",
+  "description": "Planificador de cargas y descargas de muelle (reescritura Node/Express)",
+  "type": "commonjs",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "mssql": "^11.0.1",
+    "multer": "^2.4.0",
+    "puppeteer": "^25.11.0",
+    "qrcode": "^1.5.4"
+  },
+  "allowScripts": {
+    "puppeteer@25.11.0": true
+  }
+}

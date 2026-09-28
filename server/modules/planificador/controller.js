@@ -1,0 +1,52 @@
+'use strict';
+
+const database = require('../../config/database');
+const PlanificadorRepository = require('./repository');
+
+/** Controlador del módulo Planificador. Réplica de src/Modules/Planificador/PlanificadorController.php. */
+class PlanificadorController {
+  async repository() {
+    return new PlanificadorRepository(await database.connection());
+  }
+
+  async planigrid(almacen) {
+    const repository = await this.repository();
+    const filas = await repository.planigrid(almacen);
+
+    return filas.map((fila) => ({
+      'in-out': fila['in-out'],
+      id: fila.id,
+      Tipo_de_carga: fila.Tipo_de_carga,
+      propietario: fila.propietario,
+      consignacion: fila.consignacion,
+      fecha_prevista: fila.fecha_prevista,
+      muelle: fila.muelle ?? '',
+      Mreservado: fila.Mreservado ?? '',
+      Observaciones: fila.Observaciones ?? '',
+      Transportista: fila.Transportista,
+      OrdenCompra: fila.OrdenCompra ?? '',
+      hora_programada: fila.hora_programada ?? '',
+      h_llegada: fila.h_llegada ?? '',
+      bultos: fila.bultos ?? '',
+      estado: fila.estado,
+      EstadoCarga: fila.EstadoCarga ?? '',
+      rango: fila.rango ?? 'N/A',
+      precinto: fila.precinto ?? 'N/A',
+      peligrosidad: fila.peligrosidad ?? '',
+      colorestadocarga: fila.colorestadocarga,
+    }));
+  }
+
+  async agruparcd(selectedRows, usuario) {
+    const repository = await this.repository();
+    const exito = await repository.agruparcd(selectedRows, usuario);
+
+    if (exito) {
+      return { status: 'success', Notificacion: 'correcto', Asunto: 'Operación exitosa', Message: 'Se agrupó correctamente la selección.' };
+    }
+
+    return { status: 'error', Notificacion: 'error', Asunto: 'Error', Message: 'Ha habido algún error, contactar con el desarrollador.' };
+  }
+}
+
+module.exports = new PlanificadorController();

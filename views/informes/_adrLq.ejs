@@ -1,0 +1,109 @@
+<%
+/**
+ * Bloque "CUMPLIMENTAR PARA MERCANCÍA ADR/LQ". Espera en `adrLq`:
+ * { tipo:'ADR'|'LQ', peligrosidad, previas:[], durante:[]|null, final:[],
+ *   operarios, conFirma, firmaDataUri }
+ * Réplica de HojaCarga1Renderer::tablaAdr()/tablaLq() (y su equivalente en
+ * HojaCarga2/HojaDescarga1) — misma numeración de secciones y mismos campos.
+ */
+function filasEnParejas(filas) {
+  const parejas = [];
+  for (let i = 0; i < filas.length; i += 2) {
+    parejas.push([filas[i], filas[i + 1] || null]);
+  }
+  return parejas;
+}
+%>
+<hr>
+<table>
+  <% if (adrLq.tipo === 'ADR') { %>
+  <tr>
+    <td colspan="2" class="center" style="font-size:10px;width:50%">
+      CUMPLIMENTAR PARA MERCANCÍA <strong><%= adrLq.peligrosidad %></strong>
+    </td>
+    <td colspan="2" class="bg-gris center bold" style="width:50%">1. CORRECTO EQUIPAMENTO DEL VEHÍCULO: SI/NO</td>
+  </tr>
+  <tr>
+    <td colspan="4" class="justify">
+      El transportista mediante su firma, confirma que tiene los componentes que se muestran a continuación y en
+      caso de no tener alguno de ellos, lo comunicará a la persona de administración antes de salir de las
+      instalaciones de Aza Logistics: Extintores; Calzos para ruedas; Caja de herramientas; 2 señales de advertencia
+      autoportantes; Líquido aclarador de ojos; Guantes protectores; Chaleco reflectante; Aparato de iluminación;
+      Equipo de protección ocular; Pala; Obturador de entrada al alcantarillado; Recipiente colector; Mascarilla de
+      Emergencia (Sólo para tóxicos); Dispositivo para facilitar la estiba, apuntalamiento o blocaje de los bultos.
+    </td>
+  </tr>
+  <tr><td colspan="4" class="bg-gris center bold">2. COMPROBACIONES PREVIAS A LA CARGA</td></tr>
+  <% } else { %>
+  <tr>
+    <td colspan="4" class="center" style="font-size:10px">
+      CUMPLIMENTAR PARA MERCANCÍA <strong><%= adrLq.peligrosidad %></strong>
+    </td>
+  </tr>
+  <tr><td colspan="4" class="bg-gris center bold">1. COMPROBACIONES PREVIAS A LA CARGA</td></tr>
+  <% } %>
+
+  <% filasEnParejas(adrLq.previas).forEach((par) => { %>
+  <tr>
+    <td style="width:46.1%;white-space:pre-line"><%= par[0].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[0].value || '' %></td>
+    <% if (par[1]) { %>
+    <td style="width:46.1%;white-space:pre-line"><%= par[1].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[1].value || '' %></td>
+    <% } else { %>
+    <td colspan="2"></td>
+    <% } %>
+  </tr>
+  <% }) %>
+
+  <% if (adrLq.tipo === 'ADR') { %>
+  <tr><td colspan="4" class="bg-gris center bold">3. COMPROBACIONES DURANTE LA CARGA</td></tr>
+  <% filasEnParejas(adrLq.durante || []).forEach((par) => { %>
+  <tr>
+    <td style="width:46.1%;white-space:pre-line"><%= par[0].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[0].value || '' %></td>
+    <% if (par[1]) { %>
+    <td style="width:46.1%;white-space:pre-line"><%= par[1].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[1].value || '' %></td>
+    <% } else { %>
+    <td colspan="2"></td>
+    <% } %>
+  </tr>
+  <% }) %>
+  <tr><td colspan="4" class="bg-gris center bold">4. COMPROBACIONES FINAL DE LA CARGA</td></tr>
+  <% } else { %>
+  <tr><td colspan="4" class="bg-gris center bold">2. COMPROBACIONES FINAL DE LA CARGA</td></tr>
+  <% } %>
+
+  <% filasEnParejas(adrLq.final).forEach((par) => { %>
+  <tr>
+    <td style="width:46.1%;white-space:pre-line"><%= par[0].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[0].value || '' %></td>
+    <% if (par[1]) { %>
+    <td style="width:46.1%;white-space:pre-line"><%= par[1].campohtml %></td>
+    <td class="azul" style="width:3.9%"><%= par[1].value || '' %></td>
+    <% } else { %>
+    <td colspan="2"></td>
+    <% } %>
+  </tr>
+  <% }) %>
+
+  <% if (adrLq.tipo === 'ADR') { %>
+  <tr><td colspan="4" class="bg-gris center bold">5. ENTREGA DE CARTA DE PORTE: SI/NO</td></tr>
+  <tr>
+    <td colspan="2" class="center">Firmado el Conductor</td>
+    <td colspan="2" class="center">Nombre y apellidos Responsable Carga / descarga (AZAL)</td>
+  </tr>
+  <tr>
+    <td colspan="2" class="center" style="height:60px">
+      <% if (adrLq.conFirma && adrLq.firmaDataUri) { %>
+      <img class="firma-img" src="<%= adrLq.firmaDataUri %>" alt="Firma conductor">
+      <% } %>
+    </td>
+    <td colspan="2" class="justify bold"><%= adrLq.operarios %></td>
+  </tr>
+  <% } else { %>
+  <tr><td colspan="4" class="bg-gris center bold">Nombre y apellidos Responsable Carga / descarga (AZAL)</td></tr>
+  <tr><td colspan="4" class="justify bold"><%= adrLq.operarios %></td></tr>
+  <% } %>
+</table>

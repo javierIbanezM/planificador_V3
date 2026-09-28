@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Etiqueta Genérica Identificativa Logistics</title>
+<style>
+  @page { size: 105mm 148mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 3.2mm; color: #000; }
+  .etiqueta {
+    position: relative;
+    width: 105mm;
+    height: 148mm;
+    page-break-after: always;
+    overflow: hidden;
+  }
+  .etiqueta:last-child { page-break-after: auto; }
+  .abs { position: absolute; }
+
+  /* Cabecera: logo + título + bloque ED/COD/Elaborado, con borde exterior.
+     Las 3 columnas van a partes iguales (~33.67mm cada una), igual que el
+     original TCPDF (tabla sin anchos explícitos = columnas equirrepartidas),
+     en vez del reparto desigual (26/47/28mm) que había antes. */
+  .cabecera-caja { top: 3mm; left: 2mm; width: 101mm; height: 18mm; border: 0.3mm solid #000; display: flex; }
+  .cabecera-logo { flex: 1; display: flex; align-items: center; justify-content: center; border-right: 0.3mm solid #000; }
+  .cabecera-logo img { width: 22mm; }
+  .cabecera-titulo { flex: 1; display: flex; align-items: center; justify-content: center; border-right: 0.3mm solid #000; padding: 0 2mm; }
+  .cabecera-titulo span { color: #477CD0; font-weight: bold; font-size: 3.6mm; text-align: center; line-height: 1.2; }
+  .cabecera-datos { flex: 1; display: flex; flex-direction: column; }
+  .cabecera-datos div { flex: 1; border-bottom: 0.3mm solid #000; font-size: 2.6mm; padding: 0.5mm 1mm; display: flex; align-items: center; }
+  .cabecera-datos div:last-child { border-bottom: none; }
+
+  /* Datos: Almacén / Propietario / Referencia / Muelle / Hora C/D / Bultos (+ Palets aportados).
+     Réplica del original TCPDF: cada fila es una mini-tabla independiente con
+     su propio ancho de "columna" de etiqueta (65/80/77/48/65/50 en el PHP),
+     así el valor queda pegado a su etiqueta en vez de alinearse todos a una
+     columna común (que deja un hueco más ancho en las etiquetas cortas). */
+  /* Ajustado arriba (pegado a la cabecera, poco margen) y dejando 8mm de
+     margen abajo antes de la barra de referencia (58mm) — antes llegaba
+     hasta el propio 58mm sin margen. El reparto con space-between ya
+     reserva sitio automáticamente para cuando se active la fila opcional
+     de "Palets aportados" (7ª fila): al añadirse, los huecos entre filas
+     simplemente se estrechan un poco, sin desbordar la caja. */
+  .datos { top: 22mm; left: 2mm; width: 101mm; height: 28mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .datos .fila { display: flex; padding: 0; font-size: 3.4mm; line-height: 1.1; }
+  .datos .campo-label { font-weight: bold; white-space: nowrap; margin-right: 1mm; }
+  .datos .campo-valor { }
+  /* Misma línea que "Almacén" (top igual que .datos), pegado al margen
+     derecho en vez de a una posición fija a la izquierda. */
+  .campo-playa { top: 22mm; left: 2mm; width: 101mm; text-align: right; font-weight: bold; font-size: 2.9mm; }
+
+  /* Alineado con la última fila del bloque de datos (línea 7: "Bultos" o,
+     cuando se active, "Palets aportados"), que con space-between siempre
+     queda pegada al borde inferior de .datos (22mm + 28mm = 50mm). */
+  .check-recepcionado { top: 50mm; left: 79mm; width: 24mm; }
+
+  .atencion-rotin { top: 22mm; left: 58mm; width: 42mm; }
+
+  /* Bloque referencia grande + IN/OUT + QR, con barras gruesas (no caja).
+     Repartido para que el conjunto de la etiqueta ocupe todo el alto físico
+     (148mm) con huecos más generosos entre secciones, en vez de quedar
+     todo apretado arriba con una franja en blanco grande en el medio. */
+  .bloque-referencia { top: 58mm; left: 2mm; width: 101mm; }
+  .barra-referencia {
+    border-top: 1mm solid #000;
+    border-bottom: 1mm solid #000;
+    text-align: center;
+    font-weight: bold;
+    padding: 1mm 0;
+    white-space: nowrap;
+  }
+  /* 28mm quedaba casi exacto al alto del texto "IN"/"OUT" a 105pt (~26.6mm
+     de cap-height), sin apenas margen: quedaba pegado a la barra gruesa de
+     arriba. Se sube a 44mm para que quepan cómodos el texto IN/OUT y el QR
+     agrandados. */
+  .fila-inout-qr { display: flex; height: 44mm; }
+  /* 55mm/46mm dejaba la línea divisoria desplazada a la derecha del centro
+     real (50.5mm de 101mm). A partes iguales para que quede centrada. */
+  .celda-inout {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .celda-qr {
+    flex: 1;
+    border-left: 0.5mm solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  /* El QR en sí (sin contar la referencia pequeña debajo) debe abarcar
+     arriba y abajo lo mismo que el texto IN/OUT de la celda de al lado —
+     por eso va casi a la altura completa de la fila, no centrado con hueco
+     de sobra por los lados. */
+  .celda-qr img { width: 39mm; height: 39mm; }
+  .celda-qr .ref-pequena { font-size: 2.6mm; font-weight: bold; margin-top: 0.5mm; }
+
+  .indicativo-playa { top: 118mm; left: 2mm; width: 101mm; }
+
+  .footer-txt { top: 141mm; left: 2mm; width: 101mm; text-align: center; font-size: 2.8mm; }
+</style>
+</head>
+<body>
+<% paginas.forEach((p) => { %>
+<div class="etiqueta">
+
+  <div class="abs cabecera-caja">
+    <div class="cabecera-logo"><img src="<%= imagenes.logo %>" alt="Logo"></div>
+    <div class="cabecera-titulo"><span>ETIQUETA DESCARGA PLANIFICADOR</span></div>
+    <div class="cabecera-datos">
+      <div>ED: 02</div>
+      <div>COD: PSGC-03-EDP</div>
+      <div>Elaborado por Andrés Sánchez / IT</div>
+    </div>
+  </div>
+
+  <div class="abs datos">
+    <div class="fila"><span class="campo-label">Almacén:</span><span class="campo-valor"><%= p.almacen %></span></div>
+    <div class="fila"><span class="campo-label">Propietario:</span><span class="campo-valor"><%= p.propietario %></span></div>
+    <div class="fila"><span class="campo-label">Referencia:</span><span class="campo-valor"><%= p.referenciareducida %></span></div>
+    <div class="fila"><span class="campo-label">Muelle:</span><span class="campo-valor"><%= p.muelle %></span></div>
+    <div class="fila"><span class="campo-label">Hora C/D:</span><span class="campo-valor"><%= p.horacd %></span></div>
+    <div class="fila"><span class="campo-label">Bultos:</span><span class="campo-valor"><%= p.bultos %> <%= p.fechafincd %></span></div>
+    <% if (p.mostrarGranel) { %>
+    <div class="fila"><span class="campo-label">Palets aportados:</span><span class="campo-valor"><%= p.paletsAportados %></span></div>
+    <% } %>
+  </div>
+
+  <% if (p.playa) { %>
+  <div class="abs campo-playa">Playa: <%= p.playa %></div>
+  <% } %>
+
+  <img class="abs check-recepcionado" src="<%= imagenes.checkRecepcionado %>" alt="Recepcionado">
+
+  <% if (p.mostrarAtencionRotura) { %>
+  <img class="abs atencion-rotin" src="<%= imagenes.atencionRotin %>" alt="Atención rotura">
+  <% } %>
+
+  <div class="abs bloque-referencia">
+    <div class="barra-referencia" style="font-size:<%= p.fontSizeReferencia %>pt"><%= p.referencia %></div>
+    <div class="fila-inout-qr">
+      <div class="celda-inout" style="font-size:<%= p.fontSizeInOut %>pt"><%= p.inout %></div>
+      <div class="celda-qr">
+        <% if (p.qrDataUri) { %><img src="<%= p.qrDataUri %>" alt="QR <%= p.referencia %>"><% } %>
+        <div class="ref-pequena"><%= p.referencia %></div>
+      </div>
+    </div>
+  </div>
+
+  <img class="abs indicativo-playa" src="<%= imagenes.indicativoPlaya %>" alt="Indicativo playa">
+
+  <div class="abs footer-txt">Pegar una etiqueta en 2 lados de la playa descargada</div>
+</div>
+<% }) %>
+</body>
+</html>

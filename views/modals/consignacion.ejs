@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<body>
+
+  <div class="modal fade" id="modalconsignacion" tabindex="-1" role="dialog" aria-labelledby="titlemodal"
+    aria-hidden="true" style="z-index:1051">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="titlemodal"><a id="tituloModal">Expedición/Preaviso</a>
+            <span style="position:absolute;" tabindex="0" data-toggle="tooltipidplanigrid" data-html="true"
+              data-placement="bottom" title='
+                          <div class="text-white p-3">
+                              Formulario de edición de una C/D<br><br>
+                              idplanigrid: <a id="idplanigrid"></a>
+
+                          </div>'>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="black" class="bi bi-info-circle"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+              </svg>
+            </span>
+          </h5>
+          <table>
+            <tr>
+              <td>
+                <a>Sonda en C/D:</a>
+              </td>
+              <td style="min-width:25px; text-align: end;vertical-align:initial;">
+                <input class="form-check-input" style="transform: scale(1.2);" type="checkbox" onchange="cambiosonda()"
+                  id="sonda">
+              </td>
+              <td>
+                <select onchange="temperaturasrango(this)" id="selecttemprango">
+                  <!-- Se escribe por script -->
+                </select>
+              </td>
+
+              <td>
+                <a>Datalogger en C/D:</a>
+              </td>
+              <td style="min-width:25px; text-align: end;vertical-align:initial;">
+                <input class="form-check-input" style="transform: scale(1.2);" type="checkbox" onchange="cambiodatalogger()"
+                  id="datalogger">
+              </td>
+
+              <td>
+                <svg xmlns="http://www.w3.org/2000/svg" id="bellactiva" width="16" height="22" fill="currentColor"
+                  onclick="desactalertamail()" class="bi bi-bell-fill" viewBox="0 0 16 16"
+                  style="display:none;color:red;">
+                  <path
+                    d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="bellinactiva" width="16" height="22" fill="currentColor"
+                  onclick="actalertamail()" class="bi bi-bell-slash-fill" viewBox="0 0 16 16" style="display:none;">
+                  <path
+                    d="M5.164 14H15c-1.5-1-2-5.902-2-7q0-.396-.06-.776zm6.288-10.617A5 5 0 0 0 8.995 2.1a1 1 0 1 0-1.99 0A5 5 0 0 0 3 7c0 .898-.335 4.342-1.278 6.113zM10 15a2 2 0 1 1-4 0zm-9.375.625a.53.53 0 0 0 .75.75l14.75-14.75a.53.53 0 0 0-.75-.75z" />
+                </svg>
+              </td>
+              <td>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <!-- Menú Vertical     -->
+              <div>
+                <img class="img-thumbnail" onclick="botoneditar()" src="<%= baseUrl %>assets/img/edit.png" style="margin-bottom: 5px;"
+                  id="btn-edit">
+                <br>
+                <img class="img-thumbnail" onclick="botonguardar()" src="<%= baseUrl %>assets/img/guardar.png" id="btn-guardar"
+                  style="visibility:hidden;">
+                <br>
+                <img class="img-thumbnail" onclick="botonnoeditar()" src="<%= baseUrl %>assets/img/cerrar.png" id="btn-cerrar"
+                  style="visibility:hidden;">
+              </div>
+              <!-- Fín Menú Vertical -->
+              <div style="padding-left: 5px;width:96%">
+                <h6 class="modal-title" id="titlemodal">Cabecera de la orden</h6>
+                <!-- Primera tabla de cabecera -->
+                <table class="table table-light table-bordered dataTable" id="tablacab">
+                  <thead>
+                    <tr role="row">
+                      <th style="width: 1%;">Muelle</th>
+                      <th style="width: 5%;">Reserva</th>
+                      <th style="width: 25%;">Observación</th>
+                      <th style="width: 2%;">Fecha Progr</th>
+                      <th style="width: 1%;">Llegada</th>
+                      <th style="width: 5%;">Salida</th>
+                      <th style="width: 5%;">Precinto</th>
+                      <th style="width: 5%;">Bultos
+                        <span style="position:absolute;margin-left:3px;" tabindex="0" data-toggle="tooltip"
+                          data-html="true" data-placement="bottom" title="
+                          <div class='text-white p-3'>
+                              Bultos CargaDescarga / Bultos Totales Consignación
+                          </div>">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="black"
+                            class="bi bi-info-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path
+                              d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                          </svg>
+                        </span>
+                      </th>
+                      <th style="width:2%;">Estado CD</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bodytablacab">
+                    <!-- Se escriben datos por script -->
+                  </tbody>
+                </table>
+                <!-- Fin Tabla Cabecera -->
+                <hr>
+                <h6 class="modal-title" id="titlemodal">Pedidos/Albaranes</h6>
+                <div class="dataTables_scrollBody"
+                  style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+                  <table class="table table-light table-bordered dataTable" role="grid" id="tabladatos">
+                    <thead>
+                      <tr role="row">
+                        <th style="width: 0%"><input class="form-check-input"
+                            style="transform:scale(1.2);position:initial;margin-top:0px;margin-left:0px" type="checkbox"
+                            onchange="seleccionarvisiblesdblclick()" id="flexCheckDefaultdblclick"></input></th>
+                        <th style="width: 5%;">Propietario</th>
+                        <th style="width: 5%;">Pedido</th>
+                        <th style="width: 10%;">Consignación</th>
+                        <th style="width: 5%;">Transportista</th>
+                        <th style="width: 3%;">Estado SGA</th>
+                        <th style="width: 1%;">ADR/LQ
+                          <span style="position:absolute;margin-left:3px;" tabindex="0" data-toggle="tooltip"
+                            data-html="true" data-placement="left" title="
+                          <div class='text-white p-3'>
+                              Peligrosidad de la carga/descarga. <br>En caso de Carga deberá ser firmada por el Chófer antes de salir con la carga a través de la tablet de visita.
+                          </div>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="red"
+                              class="bi bi-info-circle" viewBox="0 0 16 16">
+                              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                              <path
+                                d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                            </svg>
+                          </span>
+                        </th>
+                        <th style="width: 2%;">Playa</th>
+                        <th style="width: 1%;">Bultos</th>
+
+                      </tr>
+                    </thead>
+                    <tbody id="btabladatos">
+                    </tbody>
+                    <thead>
+                      <tr role="row">
+                        <th style="width: 0%"></th>
+                        <th style="width: 5%;">Propietario</th>
+                        <th style="width: 5%;">Pedido</th>
+                        <th style="width: 10%;">Consignación</th>
+                        <th style="width: 5%;">Transportista</th>
+                        <th style="width: 3%;">Estado SGA</th>
+                        <th style="width: 1%;">ADR/LQ</th>
+                        <th style="width: 2%;">Playa</th>
+                        <th style="width: 1%;">Bultos</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <!-- Fin tabla de pedidos de consignación -->
+                </div>
+                <div style="text-align: right;">
+                  <span>Registros en la tabla: </span><span id="contadorbtabladatos">0</span>
+                </div>
+
+
+                <div id="divaccionesconsignacion" style="display:none">
+                  <hr>
+                  <h6 class="modal-title" id="titlemodal">Acciones en la Carga/Descarga</h6>
+                  <table class="table table-light table-bordered dataTable" role="grid">
+                    <thead>
+                      <tr role="row">
+                        <th style="width: 1%;">Fecha</th>
+                        <th style="width: 20%;">Descripción</th>
+                        <th style="width: 1%;">Usuario</th>
+                        <th style="width: 0.1%;padding-right: 0px;padding-left: 17px;"></th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div class="dataTables_scrollBody"
+                    style="position: relative; overflow: auto; width: 100%; max-height:25vh">
+                    <table class="table table-light table-bordered dataTable" role="grid" id="tabladatos">
+                      <thead></thead>
+                      <tbody id="bodytablaacciones">
+                      </tbody>
+                      <thead>
+                        <tr role="row" style="visibility:collapse">
+                          <th style="width: 1%;">Fecha</th>
+                          <th style="width: 20%;">Descripción</th>
+                          <th style="width: 1%;">Usuario</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+
+                <div id="divgaleriaconsignacion" style="display:none;">
+                  <h6 class="modal-title" id="titlemodal">Galeria en la Carga/Descarga</h6>
+                  <!-- Se muestran por <script></script> -->
+                </div>
+
+                <div id="divquizcalidadconsignacion" style="display:none">
+                  <h6 class="modal-title">Quiz Calidad CDMUELLES</h6>
+                  <table class="table table-bordered table-striped table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50%;">Criterios</th>
+                        <th style="width: 50%; text-align: center;">Respuesta</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbodycheckcalidad">
+                      <!-- Aquí se insertarán las filas dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+
+
+
+                <!-- Botones de funciones     -->
+                <div style="text-align:center; margin-top: 1vh">
+                  <button id="btn-llegada" onclick="Asignallegada()"
+                    title="Asignará ó Desasignará 'H.Llegada' con la hora actual del sistema" type="button"
+                    class="btn btn-info" style="display: inline-block; margin-right:1vh;" id="Asign-Llegada">Des/asignar
+                    llegada</button>
+                  <button id="btn-salida" onclick="Asignasalida()"
+                    title="Asignará ó Desasignará 'H. Salida' con la hora actual del sistema" type="button"
+                    class="btn btn-secondary" style="display: inline-block; margin-right:1vh;"
+                    id="Asign-Salida">Des/asignar Salida</button>
+                  <!-- <button id="btn-elimina-muelle" onclick="Eliminarmuelle()" type="button" class="btn btn-danger"
+                    style="display: inline-block; margin-right:1vh;" id="Eliminar Muelle">Eliminar Muelle</button> -->
+                  <button id="btn-cargadescarga" onclick="cargadescarga()" type="button" class="btn btn-primary"
+                    style="display: inline-block; margin-right:1vh;">Informe C/D</button>
+                  <!-- <button id="btn-etigenidenti" onclick="etigeniden()" type="button" class="btn btn-primary"
+                    style="display: inline-block; margin-right:1vh;">Francisco</button> -->
+                  <button type="button" class="btn btn-info dropdown-toggle"
+                    style="display: inline-block; margin-right:1vh;" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">Opciones</button>
+                  <div class="dropdown-menu">
+                    <div style="display:none;" id="MenuAdmin">
+                      <a class="dropdown-item disabled" style="color:Red;" onclick="EliminarCD()">Eliminar C/D</a>
+                      <a class="dropdown-item disabled" style="color:Red;" onclick="EliminarDatosCD()">Eliminar Datos
+                        CDMUELLES</a>
+                      <div class="dropdown-divider"></div>
+                    </div>
+                    <a class="dropdown-item" onclick="etigeniden()">Etiqueta Genérica</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" onclick="mostraracciones()">Acciones</a>
+                    <a class="dropdown-item" onclick="mostrargaleria()">Galería</a>
+                    <a class="dropdown-item" onclick="mostrarQuizCalidad()">Quiz Calidad</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" onclick="desagruparcddblclick()">Desagrupar</a>
+                    <a class="dropdown-item" onclick="Eliminarmuelle()">Eliminar Muelle</a>
+                  </div>
+                  <!-- <button id="btn-mostraracciones" onclick="mostraracciones()" type="button" class="btn btn-primary"
+                    style="display: inline-block; margin-right:1vh;">Acciones</button> -->
+                  <!-- <button id="btn-mostrargaleria" onclick="mostrargaleria()" type="button" class="btn btn-primary"
+                    style="display: inline-block; margin-right:1vh;">Galería</button> -->
+                  <!-- <button type="button" class="btn btn-danger" style="display: inline-block; margin-right:1vh;"
+                    id="EliminarCD">Eliminar Carga/Descarga</button>
+                  <button type="button" class="btn btn-primary" style="display: inline-block; margin-right:1vh;"
+                    id="Qr-Trazal">QR TRAZAL</button> -->
+                </div>
+                <!-- Fin botones de funciones -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="overlay">
+    <div id="loading-spinner"></div>
+  </div>
+</body>
+
+<script>
+  // En caso que presionen intro en la cabecera o Esc
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if (btnguardar.style.visibility === "visible") {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          btnguardar.click();
+        }
+        if (event.keyCode === 27) {
+          event.preventDefault();
+          btncerrar.click();
+        }
+      }
+    });
+  });
+
+
+  // Declaramos variables para usarlas en los botones
+  var btnedit = document.getElementById("btn-edit");
+  var btnguardar = document.getElementById("btn-guardar");
+  var btncerrar = document.getElementById("btn-cerrar");
+  var tabla = document.getElementById("tablacab");
+  var btnllegada = document.getElementById("btn-llegada");
+  var btnsalida = document.getElementById("btn-salida");
+  var btneliminamuelle = document.getElementById("btn-elimina-muelle");
+
+  function mostraracciones() {
+    botonmostraracciones = document.getElementById('btn-mostraracciones');
+    divaccionesconsignacion = document.getElementById('divaccionesconsignacion');
+
+    if (divaccionesconsignacion.style.display == 'none') {
+      var formData = new FormData();
+      formData.append('funcion', 'logsdblclickconsignacion');
+      var options = {
+        method: 'POST',
+        body: formData,
+      };
+      fetch(baseUrl + 'api/consignacion.php', options)
+        .then(response => response.json())
+        .then(data => {
+          var html = '';
+          if (data == null) {
+            html = '<tr><td style="text-align:center;" colspan="3">No existen acciones en esta C/D</td></tr>';
+          } else {
+            data.forEach(item => {
+              var style = (item.instruccion === "DELETE") ? 'background-color: red; color: white;' : '';
+              html += '<tr data-id="' + item.id + '" style="' + style + '">';
+              html += '<td class="tablaplaning">' + item.fecha + '</td>';
+              html += '<td class="tablaplaning" style="white-space: normal">' + item.descripcion + '</td>';
+              html += '<td class="tablaplaning">' + item.usuario + '</td>';
+              html += '</tr>';
+            });
+          };
+          document.getElementById('bodytablaacciones').innerHTML = html;
+        });
+      divaccionesconsignacion.style.display = 'block';
+    } else {
+      divaccionesconsignacion.style.display = 'none';
+    }
+  }
+
+  function mostrargaleria() {
+    divgaleriaconsignacion = document.getElementById('divgaleriaconsignacion');
+
+    if (divgaleriaconsignacion.style.display == 'none') {
+      mostrarimagenesgaleria();
+    } else {
+      divgaleriaconsignacion.style.display = 'none';
+    }
+  }
+
+  function mostrarimagenesgaleria() {
+    let formData = new FormData();
+    formData.append('funcion', 'galeriaconsignacion');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          divgaleriaconsignacion.style.display = 'block';
+
+          //botonmostrargaleria.innerText = 'Galería';
+
+          // Limpiar el contenido actual del div antes de agregar las imágenes
+          divgaleriaconsignacion.innerHTML = '<hr>';
+
+          // Crear un contenedor para el scroll horizontal
+          const scrollContainer = document.createElement('div');
+          scrollContainer.style.overflowX = 'auto';
+          scrollContainer.style.whiteSpace = 'nowrap';
+          scrollContainer.style.textAlign = 'center';
+
+          // Añadir el contenedor al div principal
+          divgaleriaconsignacion.appendChild(scrollContainer);
+          // Iterar sobre el array de imágenes y crear elementos para cada una
+          data.images.forEach(image => {
+            // Crear un contenedor para cada imagen
+            const imageContainer = document.createElement('div');
+            imageContainer.style.display = 'inline-block';
+            imageContainer.style.position = 'relative'; // Añadir posición relativa al contenedor
+            imageContainer.style.marginRight = '25px'; // Añadir margen derecho de 25px
+
+            // Crear elementos HTML para mostrar la información de cada imagen
+            let imgElement = document.createElement('img');
+            imgElement.src = image.rutafichero;
+            imgElement.alt = image.descripcion;
+            imgElement.style.width = '150px';
+            imgElement.style.display = 'block';
+
+            // Añadir la imagen al contenedor
+            imageContainer.appendChild(imgElement);
+
+            // Agregar un contenedor para el botón de eliminar con fondo blanco redondo
+            const deleteContainer = document.createElement('div');
+            deleteContainer.style.position = 'absolute';
+            deleteContainer.style.top = '5px';
+            deleteContainer.style.right = '5px';
+            deleteContainer.style.background = 'white';
+            deleteContainer.style.borderRadius = '50%';
+            deleteContainer.style.padding = '5px'; // Ajusta el padding según tus necesidades
+            deleteContainer.setAttribute('id', image.id);
+            deleteContainer.addEventListener('click', function () {
+              eliminarFoto(image.id);
+            });
+
+            // Agregar el ícono de eliminar al contenedor del botón
+            const deleteIcon = document.createElement('img');
+            deleteIcon.src = baseUrl + 'assets/img/cerrar.png';
+            deleteIcon.style.width = '20px'; // Ajusta el tamaño del ícono según tus necesidades
+            deleteIcon.style.height = '20px';
+            deleteIcon.style.cursor = 'pointer'; // Agregar un cursor de puntero para indicar que es interactivo
+
+            // Agregar un contenedor para el botón de descarga con fondo blanco redondo
+            const downloadContainer = document.createElement('div');
+            downloadContainer.style.position = 'absolute';
+            downloadContainer.style.top = '5px';
+            downloadContainer.style.right = '40px';
+            downloadContainer.style.background = 'white';
+            downloadContainer.style.borderRadius = '50%';
+            downloadContainer.style.padding = '5px'; // Ajusta el padding según tus necesidades
+            downloadContainer.setAttribute('id', image.id);
+
+            // Crear el ícono de descarga
+            const downloadIcon = document.createElement('img');
+            downloadIcon.src = baseUrl + 'assets/img/guardar.png';
+            downloadIcon.style.width = '20px'; // Ajusta el tamaño del ícono según tus necesidades
+            downloadIcon.style.height = '20px';
+            downloadIcon.style.cursor = 'pointer'; // Agregar un cursor de puntero para indicar que es interactivo
+
+            // Agregar un evento de clic al ícono de descarga
+            downloadIcon.addEventListener('click', function () {
+              // Descargar la imagen al hacer clic en el ícono
+              const downloadLink = document.createElement('a');
+              downloadLink.href = image.rutafichero; // Reemplaza con la ruta correcta a tu imagen
+              downloadLink.download = image.id; // Reemplaza con el nombre que deseas para el archivo
+              downloadLink.click();
+              document.body.removeChild(downloadLink); // Eliminar el enlace después de la descarga
+            });
+            // Añadir el ícono de eliminar al contenedor del botón
+            deleteContainer.appendChild(deleteIcon);
+            imageContainer.appendChild(deleteContainer);
+
+            downloadContainer.appendChild(downloadIcon);
+            imageContainer.appendChild(downloadContainer);
+
+
+            // Agregar elemento de texto debajo de cada foto
+            const Textodescriptivo = document.createElement('p');
+            Textodescriptivo.textContent = image.descripcion;
+            Textodescriptivo.align = 'center';
+
+            imageContainer.appendChild(Textodescriptivo);
+
+
+            // Añadir el contenedor de la imagen al contenedor de scroll
+            scrollContainer.appendChild(imageContainer);
+          });
+
+
+        } else if (data.status === 'no_images') {
+          divgaleriaconsignacion.innerHTML = '';
+          divgaleriaconsignacion.style.display = 'block';
+          txtgaleria = document.createElement('h6');
+          txtgaleria.className = 'modal-title';
+          txtgaleria.innerText = 'Galería en la Carga/Descarga';
+          divgaleriaconsignacion.appendChild(txtgaleria);
+
+          Notificacion('info', 'No hay imágenes.', 'Aún no se han subido imágenes en la C/D')
+        } else {
+          Notificacion('error', 'Error en la consulta SQL: ', data.message);
+        }
+        fncontenedorsubidaimg();
+      })
+      .catch(error => {
+        console.log('Error en la solicitud fetch: ', error);
+      });
+  }
+
+  function mostrarQuizCalidad() {
+    divquizcalidadconsignacion = document.getElementById('divquizcalidadconsignacion');
+
+    if (divquizcalidadconsignacion.style.display == 'none') {
+      cargarQuizCalidad();
+    } else {
+      divquizcalidadconsignacion.style.display = 'none';
+    }
+  }
+
+  function cargarQuizCalidad() {
+    let formData = new FormData();
+    formData.append('funcion', 'datosquizcalidad');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        var html = '';
+        var currentSection = '';
+        data.forEach(item => {
+          switch (item.tipo) {
+            case 'sonda':
+              if (item.sonda !== '') {
+                html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '">';
+                html += '<td style="padding:7px 0px 7px 2px;font-size:smaller;px;width:50%">' + item.campohtml + '</td>';
+                html += '<td colspan="2" id="sonda" style="font-size:14px;width:25px;text-align:center">' + item.value + '</td>'
+                html += '</tr>';
+              }
+              break;
+            case 'precinto':
+              if (item.precintocentralita !== '') {
+                html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '">';
+                html += '<td style="padding:7px 0px 7px 2px;font-size:smaller;px;width:50%">' + item.campohtml + '</td>';
+                html += '<td colspan="2" id="precinto" precinto="' + item.precintocentralita + '" style="font-size:14px;width:25px;text-align:center">' + item.value + '</td>'
+                html += '</tr>';
+              }
+              break;
+            case 'temperatura':
+              if (item.rango !== '') {
+                html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '">';
+                html += '<td style="padding:7px 0px 7px 2px;font-size:smaller;px;width:50%">La ' + item.inout + ' tiene temperatura, indique la temperatura medida <a style="color:red">(' + item.rango + ')</a></td>';
+                html += '<td colspan="2" style="font-size:14px;width:25px;text-align:center">' + item.value + '</td>'
+                html += '</tr>';
+              }
+              break;
+            case 'quizcalidadobservacion':
+              html += '<tr>';
+              html += '<td colspan="2" style="font-size:14px;width:300px;text-align:center">' + item.campohtml + '</td></tr>';
+              html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '"><td colspan="2" id="observacion" style="font-size:14px;width:25px;text-align:center">' + item.value + '</td>';
+              html += '</tr>';
+              break;
+            case 'quizcalidad':
+              html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '">';
+              html += '<td style="padding:7px 0px 7px 2px;font-size:smaller;px;width:50%">' + item.campohtml + '</td>';
+              html += '<td style="padding:0px;font-size:small;width:5%;text-align:center">';
+              html += item.value;
+              html += '</td>';
+              html += '</tr>';
+              break;
+            case 'ADR':
+            case 'LQ':
+              if (item.seccion !== currentSection) { // Comprueba si la sección cambia
+                currentSection = item.seccion; // Actualiza la sección actual
+                html += '<tr><td colspan="2" style="text-align:center;background-color:orange;font-weight: bold;">ADR/LQ ' + currentSection + '</td></tr>';
+              }
+              html += '<tr question="' + item.id + '" tipocampo="' + item.tipo + '">';
+              html += '<td style="padding:7px 0px 7px 2px;font-size:smaller;px;width:50%">' + item.campohtml + '</td>';
+              html += '<td style="padding:0px;font-size:small;width:5%;text-align:center">';
+              html += item.value;
+              html += '</td>';
+              html += '</tr>';
+
+          }
+        });
+        document.getElementById("tbodycheckcalidad").innerHTML = html;
+        document.getElementById("divquizcalidadconsignacion").style.display = 'block';
+      })
+  }
+
+  function eliminarFoto(idfoto) {
+    let formData = new FormData();
+    formData.append('funcion', 'eliminarFoto');
+    formData.append('idfoto', idfoto);
+    const options = {
+      method: 'POST',
+      body: formData,
+    }
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          mostrarimagenesgaleria();
+          Notificacion('correcto', 'Eliminada Correctamente', 'Se eliminó correctamente el fichero.');
+        } else {
+          Notificacion('error', 'Ha habido un error para eliminar la imagen', 'Contacte con el admin, no se eliminó correctamente la imagen.');
+        }
+      })
+  }
+
+  function fncontenedorsubidaimg() {
+    var contenedorsubidaimg = document.createElement('div');
+    contenedorsubidaimg.style.textAlign = 'center';
+    var formulariosubida = '<br>Puedes subir las fotos manualmente, seleccione el tipo de foto que subirá, elija el archivo y presione <strong>subir</strong>.';
+    formulariosubida += '<br><select id="tiposelectimg" class="form-select"><option value="EXTRA">Extra</option><option value="INICIAL">Inicial</option><option value="Transcurso">Transcurso</option><option value="Final">Final</option><option value="SONDA">Sonda</option><option value="PRECINTO">Precinto</option></select>';
+    formulariosubida += '<form id="imageForm" enctype="multipart/form-data">';
+    formulariosubida += '<input type="file" name="image[]" accept="image/*" multiple maxlength="5">';
+    formulariosubida += '<input type="submit" value="Subir" id="submitButton" onclick="subidaficheros(event)">';
+    formulariosubida += '</form>';
+
+    contenedorsubidaimg.innerHTML = formulariosubida; // Asignar el contenido HTML al nuevo div creado
+    divgaleriaconsignacion.appendChild(contenedorsubidaimg);
+  }
+
+  function subidaficheros() {
+    event.preventDefault(); // Evitar la acción predeterminada del formulario.
+
+
+    document.getElementById('overlay').style.display = 'flex';
+    const inputArchivo = document.querySelector('input[type="file"]');
+    tiposelectimgvalue = document.getElementById('tiposelectimg').value
+    LimiteDeFicherosASubir = 5;
+    if (inputArchivo.files.length === 0) {
+      document.getElementById('overlay').style.display = 'none';
+      alert("Debes anexar un archivo antes de subirlo.");
+      return;
+    }
+
+    if (inputArchivo.files.length > LimiteDeFicherosASubir) {
+      document.getElementById('overlay').style.display = 'none';
+      alert('Por favor, selecciona un máximo de ' + LimiteDeFicherosASubir + ' archivos, si necesitas subir más tendrás que repetir el proceso seleccionando los demás ficheros');
+      return;
+    }
+
+
+
+    const form = document.getElementById('imageForm');
+    const formData = new FormData(form);
+    formData.append('funcion', 'up_img_ofi');
+    //formData.append('id', idplanigrid); es la variable de session.
+    formData.append('descripcion', tiposelectimgvalue);
+    const files = inputArchivo.files;
+    // Iterar a través de los archivos y agregarlos al FormData
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      formData.append('image[]', file); // Usar 'image[]' para permitir la subida de múltiples archivos
+    }
+
+    // Enviar el formulario al servidor
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(result => {
+          if (result.status === 'success') {
+            inputArchivo.value = '';
+            document.getElementById('overlay').style.display = 'none';
+            mostrarimagenesgaleria()
+          } else {
+            // Manejar mensajes de error
+            alert(result.message);
+          }
+        });
+      });
+  }
+
+  function etigeniden() {
+    window.open(baseUrl + 'informes/etiqueta-generica.php?salida=i&almacen=SAGUNTO', '_blank');
+  }
+
+
+  function cargadescarga() {
+    var tbody = document.getElementById("bodytablacab");
+    var dataId = tbody.getElementsByTagName("tr")[0];
+    let formData = new FormData();
+    formData.append('funcion', 'informecargadescarga');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        switch (data.cargadescarga) {
+          case 'IN':
+          case 'OUT':
+            if (data.ruta) {
+              window.open(baseUrl + 'informes/' + data.ruta + '.php', '_blank');
+            } else {
+              Notificacion('error', 'No se puede mostrar Informe', 'No hay una plantilla de informe migrada para esta consignación');
+            }
+            break;
+
+          case 'NULL':
+            Notificacion('error', 'No se puede mostrar Informe', 'Esta consignacion no está disponible, puede que se deba a su antigüedad');
+        }
+      })
+  };
+
+  // Variable global para almacenar los valores originales de las celdas
+  var valoresOriginales = [];
+  var edicionactiva = false;
+  // Función para manejar el clic en el botón de "editar"
+  function botoneditar() {
+    edicionactiva = true;
+    var celdas = tabla.getElementsByTagName("td");
+
+    // Limpiar la variable valoresOriginales antes de llenarla
+    valoresOriginales = [];
+
+    // Guardar los valores actuales de las celdas en valoresOriginales
+    for (var i = 0; i < celdas.length; i++) {
+      valoresOriginales.push(celdas[i].textContent);
+    }
+
+    // Activar la edición de las celdas
+    for (var i = 0; i < celdas.length; i++) {
+      if (celdas[i].id !== "horaprogramada" && celdas[i].id !== "btotales" && celdas[i].id !== 'estadocdmuelles') {
+        celdas[i].setAttribute("contenteditable", "true");
+      }
+    }
+
+    // Establecer el foco en el primer campo editable
+    tabla.querySelector("#muelle").focus();
+
+    // Mostrar los botones correspondientes
+    btnguardar.style.visibility = "visible";
+    btncerrar.style.visibility = "visible";
+    btnedit.style.visibility = "hidden";
+  }
+
+  // Fín presionar botón de editar
+
+  // Función para validar los datos antes de enviarlos al servidor
+  function validarDatos(celdas) {
+    var hLlegada = celdas[4].textContent;
+    var hSalida = celdas[5].textContent;
+    var muelle = celdas[0].textContent;
+
+    if (hLlegada !== '' && hSalida !== '' && muelle === '') {
+      Notificacion('error', 'Error', 'No puedes asignar Salida de una C/D sin muelle.');
+      return false;
+    }
+    if (hLlegada == '' && hSalida == '' && muelle !== '') {
+      Notificacion('error', 'Error', 'Antes debes asignar llegada para luego asignar un muelle');
+      return false;
+    }
+
+    return true;
+  }
+
+
+  // Función para enviar los datos al servidor
+  function enviarDatosAlServidor() {
+    var celdas = tabla.getElementsByTagName("td");
+    if (!hayCambios(celdas)) {
+      Notificacion('info', 'Cambios no actualizados', 'No realizó cambios en la cabecera, no se enviaron datos al servidor');
+      edicionactiva = false;
+      return;
+    }
+    var datosValidos = validarDatos(celdas);
+
+    if (!datosValidos) {
+      restaurarValoresOriginales(celdas)
+      edicionactiva = false;
+      return;
+    }
+
+    // Obtener los valores de los campos
+    var muelle = celdas[0].textContent;
+    var muelleReservado = celdas[1].textContent;
+    var observacion = celdas[2].textContent;
+    var fechaProgr = celdas[3].textContent;
+    var hLlegada = celdas[4].textContent;
+    var hSalida = celdas[5].textContent;
+    var precinto = celdas[6].textContent;
+
+    var data = {
+      muelle,
+      muelleReservado,
+      observacion,
+      fechaProgr,
+      hLlegada,
+      hSalida,
+      precinto,
+    };
+
+    var jsonData = JSON.stringify(data);
+    let formData = new FormData();
+    formData.append('funcion', 'guardarcabeceramodal');
+    formData.append('muelle', muelle);
+    formData.append('muelleReservado', muelleReservado);
+    formData.append('observacion', observacion);
+    formData.append('fechaProgr', fechaProgr);
+    formData.append('hLlegada', hLlegada);
+    formData.append('hSalida', hSalida);
+    formData.append('precinto', precinto);
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion('correcto', 'Operación Exitosa', 'Cambios en cabecera realizados correctamente');
+          var tbody = document.getElementById("bodytablacab");
+          var dataId = tbody.getElementsByTagName("tr")[0];
+          modal("consignacion", dataId);
+        } else {
+          Notificacion(data.status, data.status, data.Error);
+          restaurarValoresOriginales(celdas);
+        }
+      })
+      .catch(error => {
+        Notificacion('error', 'Error', error.message);
+      });
+    edicionactiva = false;
+  }
+
+  // Función para manejar el comportamiento del botón de guardar
+  function botonguardar() {
+    var celdas = tabla.getElementsByTagName("td");
+    for (var i = 0; i < celdas.length; i++) {
+      celdas[i].setAttribute("contenteditable", "false");
+    }
+    btnedit.style.visibility = "visible";
+    btnguardar.style.visibility = "hidden";
+    btncerrar.style.visibility = "hidden";
+
+    enviarDatosAlServidor();
+  }
+
+
+
+  // Al presionar el botón de Asignarllegada
+  function Asignallegada() {
+    if (edicionactiva) {
+      Notificacion('Error', 'Hay una edición de cabecera Activa', 'Hay una edición de cabecera activa, por favor finalice la edición de la tabla y luego realice acciones');
+      return;
+    }
+    var tbody = document.getElementById("bodytablacab");
+    var dataId = tbody.getElementsByTagName("tr")[0];
+    if (dataId.querySelector("#fechallegada").innerHTML == '') {
+      let formData = new FormData();
+      formData.append('funcion', 'asigllegada');
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+      fetch(baseUrl + 'api/consignacion.php', options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          modal("consignacion", dataId);
+          if (data.status === 'success') {
+            Notificacion('correcto', 'Operación exitosa', 'La llegada ha sido asignada correctamente.');
+          } else {
+            Notificacion('error', 'Error', 'Ha ocurrido un error al asignar la llegada.');
+          }
+        })
+    } else {
+      if (dataId.querySelector("#muelle").innerHTML == '' || dataId.querySelector("#muelle").innerHTML == 0) {
+        let formData = new FormData();
+        formData.append('funcion', 'desasignarllegada');
+        const options = {
+          method: 'POST',
+          body: formData,
+        };
+        fetch(baseUrl + 'api/consignacion.php', options)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then(data => {
+            modal("consignacion", dataId);
+            if (data.status === 'success') {
+              Notificacion('correcto', 'Operación exitosa', 'La llegada ha sido asignada correctamente.');
+            } else {
+              Notificacion('error', 'Error', 'Ha ocurrido un error al asignar la llegada.');
+            }
+          })
+      } else {
+        Notificacion('error', 'Error', 'Muelle no está vacío, quitar el muelle antes y luego quitar la llegada.');
+      }
+    }
+  }
+
+  function Asignasalida() {
+    if (edicionactiva) {
+      Notificacion('Error', 'Hay una edición de cabecera Activa', 'Hay una edición de cabecera activa, por favor finalice la edición de la tabla y luego realice acciones');
+      return;
+    }
+    var tbody = document.getElementById("bodytablacab");
+    var dataId = tbody.getElementsByTagName("tr")[0];
+    var fechallegada = dataId.querySelector("#fechallegada").textContent;
+    var fechasalida = dataId.querySelector("#fechasalida").textContent;
+    var muelle = dataId.querySelector("#muelle").textContent;
+
+    // Controlaremos posibles errores:
+    if (fechallegada !== '' && fechasalida === '' && muelle === '') {
+      Notificacion('error', 'Error', 'No puedes asignar Salida de una C/D sin muelle.');
+      botoneditar();
+      return;
+    }
+
+    if (fechallegada !== '' && fechasalida === '') {
+      let formData = new FormData();
+      formData.append('funcion', 'asigsalida');
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+      fetch(baseUrl + 'api/consignacion.php', options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          modal("consignacion", dataId);
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        })
+    } else if (fechallegada !== '' && fechasalida !== '') {
+      let formData = new FormData();
+      formData.append('funcion', 'desasignarsalida');
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+
+      fetch(baseUrl + 'api/consignacion.php', options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          modal("consignacion", dataId);
+          if (data.status === 'success') {
+            Notificacion('correcto', 'Operación exitosa', 'La salida ha sido desasignada correctamente.');
+          } else {
+            Notificacion('error', 'Error', 'No se recibió confirmación del Servidor.');
+          }
+        })
+    } else {
+      Notificacion('error', 'Error', 'Ha ocurrido un error al asignar la salida, puede que no exista llegada');
+
+    }
+  }
+
+  function temperaturasrango(temperatura) {
+    var tbody = document.getElementById("bodytablacab");
+    var dataId = tbody.getElementsByTagName("tr")[0];
+    var id = dataId.getAttribute('data-id');
+    var idtemprango = temperatura.value;
+    var indiceseleccionado = temperatura.selectedIndex;
+    var textoseleccionado = temperatura.options[indiceseleccionado].text
+
+
+    let formData = new FormData();
+    formData.append('funcion', 'cambiotemprango');
+    formData.append('temprango', idtemprango);
+    formData.append('id', id);
+    formData.append('text', textoseleccionado);
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion('correcto', 'Operación exitosa', 'Se cambió la temperatura de la consignación');
+        } else {
+          Notificacion('error', 'Error', 'No se recibió confirmación del Servidor.');
+        }
+      });
+  }
+
+  function Eliminarmuelle() {
+    if (edicionactiva) {
+      Notificacion('Error', 'Hay una edición de cabecera Activa', 'Hay una edición de cabecera activa, por favor finalice la edición de la tabla y luego realice acciones');
+      return;
+    }
+
+    // Mostrar confirmación antes de proceder
+    if (!confirm("¿Estás seguro de que deseas Eliminar el muelle?")) {
+      return; // Si el usuario cancela, no se ejecuta el resto de la función
+    }
+
+
+    var tbody = document.getElementById("bodytablacab");
+    var dataId = tbody.getElementsByTagName("tr")[0];
+    var muelle = dataId.querySelector("#muelle").innerHTML;
+
+    if (muelle !== '') {
+      let formData = new FormData();
+      formData.append('funcion', 'eliminamuelleasignado');
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+
+      fetch(baseUrl + 'api/consignacion.php', options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          modal("consignacion", dataId);
+          if (data.status === 'success') {
+            Notificacion('correcto', 'Operación exitosa', 'El Muelle ha sido eliminado correctamente.');
+          } else {
+            Notificacion('error', 'Error', 'No se recibió confirmación del Servidor.');
+          }
+        })
+    } else {
+      Notificacion('error', 'Error', 'No existe Muelle para eliminar');
+    }
+  }
+
+
+  // Función para manejar el clic en el botón de "no editar"
+  function botonnoeditar() {
+    var celdas = tabla.getElementsByTagName("td");
+
+    // Verificar si se han realizado cambios en los campos
+    if (hayCambios(celdas)) {
+      var confirmacion = confirm("¿Estás seguro de que deseas salir sin guardar los cambios?");
+      if (confirmacion) {
+        // Restaurar los valores originales en la tabla
+        restaurarValoresOriginales(celdas);
+        edicionactiva = false;
+        return;
+      }
+    }
+
+    // Si no hay cambios o el usuario confirma, desactivar la edición
+    for (var i = 0; i < celdas.length; i++) {
+      celdas[i].setAttribute("contenteditable", "false");
+    }
+    btnedit.style.visibility = "visible";
+    btnguardar.style.visibility = "hidden";
+    btncerrar.style.visibility = "hidden";
+    edicionactiva = false;
+  }
+
+  // Función para restaurar los valores originales en la tabla
+  function restaurarValoresOriginales(celdas) {
+    for (var i = 0; i < celdas.length; i++) {
+      celdas[i].textContent = valoresOriginales[i];
+    }
+    btnedit.style.visibility = "visible";
+    btnguardar.style.visibility = "hidden";
+    btncerrar.style.visibility = "hidden";
+  }
+
+  // Función para verificar si se han realizado cambios en los campos
+  function hayCambios(celdas) {
+    for (var i = 0; i < celdas.length; i++) {
+      if (celdas[i].textContent !== valoresOriginales[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function actalertamail() {
+    let formData = new FormData();
+    formData.append('funcion', 'Actalertamail');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          bellinactiva.style.display = 'none';
+          bellactiva.style.display = 'block';
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        } else {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+  }
+
+  function cambiosonda() {
+    const checkbox = document.getElementById('sonda');
+    const isChecked = checkbox.checked ? 'activado' : 'desactivado';
+
+    let formData = new FormData();
+    formData.append('funcion', 'cambiosonda');
+    formData.append('estado', isChecked); // Agregar estado al formData
+
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+          // Reflejar el estado en el checkbox
+          checkbox.checked = isChecked === 'activado';
+        } else {
+          // Si hubo un error, revertir el estado del checkbox
+          checkbox.checked = !checkbox.checked;
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+      .catch(error => {
+        console.error('Error en la solicitud:', error);
+        // Revertir el estado si ocurre un error de red
+        checkbox.checked = !checkbox.checked;
+      });
+  }
+
+
+  function cambiodatalogger() {
+    const checkbox = document.getElementById('datalogger');
+    const isChecked = checkbox.checked ? 'activado' : 'desactivado';
+
+    let formData = new FormData();
+    formData.append('funcion', 'cambiodatalogger');
+    formData.append('estado', isChecked);
+
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+          checkbox.checked = isChecked === 'activado';
+        } else {
+          checkbox.checked = !checkbox.checked;
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+      .catch(error => {
+        console.error('Error en la solicitud:', error);
+        checkbox.checked = !checkbox.checked;
+      });
+  }
+
+
+  function desactalertamail() {
+    let formData = new FormData();
+    formData.append('funcion', 'Desactalertamail');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          bellinactiva.style.display = 'block';
+          bellactiva.style.display = 'none';
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        } else {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+  }
+
+  function desagruparcddblclick() {
+    // Mostrar confirmación antes de proceder
+    if (!confirm("¿Estás seguro de que deseas desagrupar esta C/D?")) {
+      return; // Si el usuario cancela, no se ejecuta el resto de la función
+    }
+
+    // Ya no hace falta marcar casillas en "Pedidos/Albaranes": el servidor
+    // calcula solo qué expediciones/preavisos pertenecen a esta C/D
+    // (idplanigrid activo en sesión) y desagrupa el grupo completo, para
+    // no depender de que el usuario marque exactamente todas las filas
+    // correctas (si faltaba alguna, el procedimiento abortaba en silencio
+    // y antes esto igualmente mostraba "Operación exitosa").
+    Notificacion('neutro', 'Proceso de desagrupación en Curso', 'Se está desagrupando la C/D, en cuanto termine saldrá confirmación.')
+    var formData = new FormData();
+    formData.append('funcion', 'desagruparcd');
+    var options = {
+      method: 'POST',
+      body: formData,
+    };
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => response.json())
+      .then(data => {
+        Notificacion(data.Notificacion, data.Asunto, data.Message)
+      })
+  }
+
+  function EliminarCD() {
+    let formData = new FormData();
+    formData.append('funcion', 'EliminarCD');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        } else {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+  }
+
+  function EliminarDatosCD() {
+    let formData = new FormData();
+    formData.append('funcion', 'EliminarDatosCD');
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/consignacion.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        } else {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+  }
+
+
+</script>

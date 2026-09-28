@@ -1,0 +1,9 @@
+/vendor/
+/node_modules/
+/.env
+/delivery-order-tokens.json
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+Thumbs.db

@@ -1,0 +1,135 @@
+(node:4744) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4404) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+^C(node:10080) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:35:20
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+^C(node:8504) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+^C(node:6848) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:35:20
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:35:20
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:46:20
+Error: Could not find Chrome (ver. 153.0.8010.36). This can occur if either
+ 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or
+ 2. your cache path is incorrectly configured (which is: C:\Users\Administrador.ZAR\.cache\puppeteer).
+For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.
+    at ChromeLauncher.resolveExecutablePath (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:365:19)
+    at async ChromeLauncher.computeLaunchArguments (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:92:19)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:95:28)
+    at async ChromeLauncher.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/planificador-v2%20-%20node/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async Object.htmlToPdf (C:\planificador-v2 - node\server\modules\informes\pdfService.js:30:19)
+    at async InformesController.pdfEtiquetaGenerica (C:\planificador-v2 - node\server\modules\informes\controller.js:424:20)
+    at async C:\planificador-v2 - node\server\modules\informes\routes.js:67:36
+^C(node:9384) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+^C(node:4952) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+^C(node:8844) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+^C(node:1960) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+^C^C

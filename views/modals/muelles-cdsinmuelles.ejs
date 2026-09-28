@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<body>
+  <div class="modal fade" id="modalmuellescdsinmuelles" tabindex="-1" role="dialog" aria-labelledby="titlemodal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="titlemodal">
+            Información sobre Muelle: 
+            <a id="amuelleseleccionado"></a>
+            <span style="position:absolute;padding-left:5px;" tabindex="0" data-toggle="tooltipidplanigrid" data-html="true"
+              data-placement="bottom" title='
+                <div class="text-white p-3">
+                  Puede ver historial de muelle (max 100 registros).<br>
+                  Activarlo/Desactivarlo etc.
+                </div>'>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="black"
+                class="bi bi-info-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+            </span>
+          </h5>
+          
+          <!-- Switch para activar/desactivar el muelle -->
+          <div class="custom-control custom-switch ml-4">
+            <input type="checkbox" class="custom-control-input" id="switchMuelle" onchange="ActDesactMuelle(this)">
+            <label class="custom-control-label" for="switchMuelle"></label>Activar/Desactivar Muelle
+          </div>
+
+          <!-- Botón de cierre del modal -->
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <!-- Primera tabla -->
+              <div class="col-md-7 p-1">
+                <h6 class="modal-title" id="titlemodal">Últimas 100 C/D de este muelle</h6>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                  <table class="table table-light table-bordered dataTable" role="grid" id="tablahistmuelles">
+                    <thead>
+                      <tr role="row">
+                        <th>Propietario</th>
+                        <th>Consignación</th>
+                        <th>Reserva</th>
+                        <th>Llegada</th>
+                        <th>Salida</th>
+                      </tr>
+                    </thead>
+                    <tbody id="bodytablahistmuelles">
+                      <!-- Se escriben datos por script -->
+                    </tbody>
+                  </table>
+                </div>
+                <div style="text-align: right;">
+                  <span>Registros en la tabla: </span><span id="contadortablahistmuelles">0</span>
+                </div>
+              </div>
+
+              <!-- Segunda tabla -->
+              <div class="col-md-5 p-0">
+                <h6 class="modal-title" id="titlemodal">Próximas C/D reservadas para este muelle</h6>
+                <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+                  <table class="table table-light table-bordered dataTable" role="grid" id="tablareservmuelles">
+                    <thead>
+                      <tr role="row">
+                        <th style="width: 0%">
+                          <input class="form-check-input" style="transform:scale(1.2);position:initial;margin-top:0px;margin-left:0px"
+                            type="checkbox" onchange="seleccionarvisiblesdblclick()" id="flexCheckDefaultdblclick"></input>
+                        </th>
+                        <th style="width: 5%;">Propietario</th>
+                        <th style="width: 10%;">Consignación</th>
+                        <th style="width: 5%;">Transportista</th>
+                        <th style="width: 3%;">Progr</th>
+                      </tr>
+                    </thead>
+                    <tbody id="bodytablareservmuelles">
+                    </tbody>
+                  </table>
+                </div>
+                <div style="text-align: right;">
+                  <span>Registros en la tabla: </span><span id="contadortablareservmuelles">0</span>
+                </div>
+              </div>
+              <!-- Tabla de logs -->
+              <div class="col-md-12 p-0">
+              <hr>
+                <h6 class="modal-title" id="titlemodal">Logs de últimas acciones sobre este muelle</h6>
+                <div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%; max-height:25vh;">
+                  <table class="table table-light table-bordered dataTable" role="grid" id="tablalogsmuelles">
+                    <thead>
+                      <tr role="row">
+                        <th style="width: 5%;">fecha</th>
+                        <th style="width: 10%;">descripcion</th>
+                        <th style="width: 5%;">usuario</th>
+                        <th style="width: 3%;">Instrucción</th>
+                      </tr>
+                    </thead>
+                    <tbody id="bodytablalogsmuelles">
+                    </tbody>
+                  </table>
+                </div>
+                <div style="text-align: right;">
+                  <span>Registros en la tabla: </span><span id="contadortablalogsmuelles">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+
+
+
+<script>
+  // En caso que presionen intro en la cabecera o Esc
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if (btnguardar.style.visibility === "visible") {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          btnguardar.click();
+        }
+        if (event.keyCode === 27) {
+          event.preventDefault();
+          btncerrar.click();
+        }
+      }
+    });
+  });
+
+
+  function ActDesactMuelle(checkbox) {
+  muelle = checkbox.getAttribute('muelle');
+  if (checkbox.checked) {
+    let formData = new FormData();
+    formData.append('funcion', 'ActivaMuelle');
+    formData.append('muelle', muelle);
+    const options = {
+      method: 'POST',
+      body: formData,
+    };
+
+    fetch(baseUrl + 'api/muelles.php', options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        } else {
+          Notificacion(data.Notificacion, data.Asunto, data.Message);
+        }
+      })
+  } else {
+      let formData = new FormData();
+      formData.append('funcion', 'DesactivaMuelle');
+      formData.append('muelle', muelle);
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+
+      fetch(baseUrl + 'api/muelles.php', options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.status === 'success') {
+            Notificacion(data.Notificacion, data.Asunto, data.Message);
+          } else {
+            Notificacion(data.Notificacion, data.Asunto, data.Message);
+          }
+        })
+    }
+}
+
+
+</script>

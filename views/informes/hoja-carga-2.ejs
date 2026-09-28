@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Hoja de Carga AZA Logistics</title>
+<%- include('_estilos') %>
+<style>
+  /* Réplica de los anchos por fila del PHP original (Hoja_Carga_2.php).
+     A diferencia de Hoja_Carga_1/Hoja_Descarga, aquí el texto en "inglés"
+     va en negro (no azul) — el propio original usa color:BLACK en vez de
+     #477CD0 en estos bloques. */
+  .tabla-ruta, .tabla-vehiculo { border-top: 1px solid #000; border-left: 1px solid #000; margin-bottom: 4px; }
+  .tabla-ruta .fila-top, .tabla-ruta .fila-interna,
+  .tabla-vehiculo .fila-interna { display: flex; }
+  .tabla-ruta .celda, .tabla-vehiculo .celda { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 6px 4px; font-size: 9px; }
+  .tabla-vehiculo .celda { padding: 10px 4px; }
+
+  .muestra-color { display: inline-block; width: 32px; height: 8px; border: 1px solid #000; vertical-align: middle; }
+  .muestra-gris { background-color: #C0C0C0; }
+  .muestra-blanco { background-color: #fff; }
+
+  /* Cabecera en flex en vez de <table>+rowspan: con rowspan, el navegador
+     reparte el alto extra que necesita el <h1> (rowspan=3) entre las filas
+     de COD/ED/Fecha/Aprobado de forma poco predecible (deja un hueco justo
+     debajo de "ED: 05"). En flex cada fila de datos tiene su alto propio,
+     sin depender del alto del título. */
+  .cabecera-doc { display: flex; border: 1px solid #000; margin-bottom: 2px; }
+  .cabecera-doc .celda-logo,
+  .cabecera-doc .celda-titulo { flex: 0 0 33.33%; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .cabecera-doc .celda-datos { flex: 0 0 33.33%; display: flex; flex-direction: column; justify-content: center; }
+  .cabecera-doc .celda-datos .fila-dato { padding: 0 4px; line-height: 1.6; border-bottom: 1px solid #000; }
+  .cabecera-doc .celda-datos .fila-dato:last-child { border-bottom: none; }
+  .cabecera-doc h1.titulo { margin: 0; font-size: 15px; }
+  .leyenda td { padding: 0 4px; }
+
+  .franja-vertical { padding: 0 !important; text-align: center; position: relative; overflow: hidden; }
+  .franja-vertical img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <% if (!finalizada) { %>
+  <div class="marca-agua"><img src="<%= imagenes.marcaDeAgua %>" alt="No finalizado"></div>
+  <% } %>
+
+  <div class="cabecera-doc">
+    <div class="celda-logo"><img src="<%= imagenes.logo %>" style="width:48mm" alt="Logo AZA Logistics"></div>
+    <div class="celda-titulo"><h1 class="titulo" style="color:<%= tituloColor %>">HOJA DE CARGA</h1></div>
+    <div class="celda-datos">
+      <div class="fila-dato">COD: <%= cod %></div>
+      <div class="fila-dato">ED: <%= ed %></div>
+      <div class="fila-dato">Fecha: <%= fecha %></div>
+      <div class="fila-dato"><%= elaboradoPor %></div>
+    </div>
+  </div>
+
+  <table class="sin-borde leyenda">
+    <tr>
+      <td style="width:14%"><strong>Campo en Gris</strong></td>
+      <td style="width:36px"><span class="muestra-color muestra-gris"></span></td>
+      <td style="width:18.5%">Rellenado por centralita / ROC</td>
+      <td style="width:15.6%"></td>
+      <td rowspan="2" style="width:11%;padding-right:1px;vertical-align:middle">Nº Muelle<br>Asignado:</td>
+      <td rowspan="2" class="bg-gris" style="width:8%;border:1px solid #000;padding-left:1px;vertical-align:middle"><%= muelle %></td>
+      <td style="width:4.7%"></td>
+      <td rowspan="2" style="width:11%;padding-right:1px;vertical-align:middle">Fecha De la<br>Carga:</td>
+      <td rowspan="2" class="bg-gris" style="border:1px solid #000;padding-left:1px;vertical-align:middle"><%= fechaCarga %></td>
+    </tr>
+    <tr>
+      <td><strong>Campo en blanco</strong></td>
+      <td><span class="muestra-color muestra-blanco"></span></td>
+      <td>Rellenado por Operario</td>
+    </tr>
+  </table>
+
+  <div class="tabla-ruta">
+    <div class="fila-top">
+      <div class="celda bg-azul center bold" style="flex:0 0 18.75%">PROPIETARIO /<br>CONSIGNACIÓN:</div>
+      <div class="celda bg-gris" style="flex:0 0 27.3%"><%= propietario %> / <%= consignacion %></div>
+      <div class="celda bg-azul center bold" style="flex:0 0 7.8%">Nº de Ruta</div>
+      <div class="celda bg-gris" style="flex:0 0 11.7%"><%= numeroruta %></div>
+      <div class="celda bg-azul center bold" style="flex:0 0 8.9%">Precinto:</div>
+      <div class="celda bg-gris" style="flex:0 0 25.6%"><%= precinto %></div>
+    </div>
+    <div class="fila-interna">
+      <div class="celda bg-gris franja-vertical" style="flex:0 0 7.0%"><img src="<%= imagenes.chdriver %>" alt="CHOFER/DRIVER"></div>
+      <div style="flex:1">
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 40.3%">NOMBRE Y APELLIDOS/NAME AND SURNAMES:</div>
+          <div class="celda bg-gris" style="flex:0 0 59.7%"><%= conductorNombre %> <%= conductorApellidos %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 6.7%">DNI/ID:</div>
+          <div class="celda bg-gris" style="flex:0 0 93.3%"><%= conductorDni %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 16.8%">TELEFONO/PHONE:</div>
+          <div class="celda bg-gris" style="flex:0 0 33.6%"><%= conductortelefono %></div>
+          <div class="celda bg-gris" style="flex:0 0 21.0%"> LUGAR DE LA CARGA: (Población almacén AZAL)</div>
+          <div class="celda bg-gris" style="flex:0 0 28.6%"><%= poblacion %></div>
+        </div>
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 24.4%">EMPRESA DE TRANSPORTE: TRANSPORT AGENCY:</div>
+          <div class="celda bg-gris" style="flex:0 0 26.1%"><%= transportista %></div>
+          <div class="celda bg-gris" style="flex:0 0 28.6%"> Destino de la Mercancía/Destination: (Población ó País)</div>
+          <div class="celda bg-gris" style="flex:0 0 21.0%"><%= destino %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabla-vehiculo">
+    <div class="fila-interna">
+      <div class="celda bg-gris franja-vertical" style="flex:0 0 7.0%"><img src="<%= imagenes.vehicle %>" alt="VEHICULO/VEHICLE"></div>
+      <div style="flex:1">
+        <div class="fila-interna">
+          <div class="celda bg-gris" style="flex:0 0 33.6%">MATRÍCULA VEHÍCULO/VEHICLE PLATE:</div>
+          <div class="celda bg-gris" style="flex:0 0 16.8%"><%= matriculaTractora %></div>
+          <div class="celda bg-gris" style="flex:0 0 34.5%">MATRÍCULA REMOLQUE/TRAILER PLATE:</div>
+          <div class="celda bg-gris" style="flex:0 0 15.1%"><%= matricularemolque %></div>
+        </div>
+        <div class="fila-interna">
+          <div style="flex:0 0 79.0%">
+            <div class="fila-interna">
+              <div class="celda bg-gris" style="flex:0 0 66.0%">¿VEHÍCULO CONTRATADO A TEMPERATURA CONTROLADA?:</div>
+              <div class="celda bg-gris center" style="flex:0 0 4.3%"><%= temp %></div>
+              <div class="celda bg-gris" style="flex:0 0 19.1%">T. CONTRATADA:</div>
+              <div class="celda bg-gris center" style="flex:0 0 10.6%"><%= rango %></div>
+            </div>
+            <div class="fila-interna">
+              <div class="celda" style="flex:0 0 66.0%">¿TEMPERATURA VEHÍCULO COINCIDE CON LA CONTRATADA?:</div>
+              <div class="celda center" style="flex:0 0 4.3%"><%= comparaciontemp %></div>
+              <div class="celda" style="flex:0 0 19.1%">T. MEDIDA:</div>
+              <div class="celda center" style="flex:0 0 10.6%"><%= tempmedida %></div>
+            </div>
+          </div>
+          <div class="celda center" style="flex:0 0 21.0%;font-size:8.5px;display:flex;align-items:center">NOTA: Para verificar temperatura del vehiculo utilizar el termómetro IR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('_checksCalidad', { checks, observacion, mercanciaCompatible: imagenes.mercanciaCompatible, verboCompatible: 'cargar' }) %>
+
+  <p class="aviso">*Si se detecta cualquier incidencia NO CARGAR y comunicar al jefe de equipo/jefe de almacén. Serán
+    ellos quienes indicarán continuar o no con la carga*</p>
+
+  <table style="table-layout:fixed">
+    <colgroup>
+      <col style="width:58.6%">
+      <col style="width:41.4%">
+    </colgroup>
+    <tr>
+      <td class="center bold">USUARIOS INVOLUCRADOS EN LA CARGA</td>
+      <td class="center bold">TIEMPO DE CARGA</td>
+    </tr>
+    <tr>
+      <td rowspan="2" class="bold"><%= operarios %></td>
+      <td class="right">Hora de Inicio: <%= fechainicio %></td>
+    </tr>
+    <tr>
+      <td class="right">Hora Final: <%= fechafincd %></td>
+    </tr>
+  </table>
+
+  <%- include('_pedidos', { pedidos }) %>
+
+  <% if (adrLq) { %>
+  <%- include('_adrLq', { adrLq }) %>
+  <% } %>
+
+</div>
+
+<%- include('_galeria', { galeria }) %>
+
+</body>
+</html>
