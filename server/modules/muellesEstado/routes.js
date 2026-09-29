@@ -9,12 +9,7 @@ const router = express.Router();
 // GET /api/muelles-estado.php — réplica de public/api/muelles-estado.php.
 // El original no comprueba el método HTTP (solo Auth::check()); se replica
 // igual y se acepta en GET, que es como lo consume header-muelles.ejs.
-router.get('/api/muelles-estado.php', async (req, res) => {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-
+router.get('/api/muelles-estado.php', auth.requireLoginApi('No autenticado'), async (req, res) => {
   res.json(await controller.estado(String(req.session.almacen || '')));
 });
 

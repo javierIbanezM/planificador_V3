@@ -1,6 +1,7 @@
 'use strict';
 
 const Repository = require('../../data/repository');
+const { bultosEfectivos } = require('../../data/sqlFragments');
 
 /**
  * Estado de carga/descarga del kiosco PDA (planigrid + muellesasignados).
@@ -220,8 +221,8 @@ class PlanigridCdRepository extends Repository {
         END as albaran,
         CASE
             WHEN pg.[in-out] = 'IN' THEN NULL
-            WHEN pg.agrupacion IS NOT NULL AND pg.[in-out] = 'OUT' THEN ISNULL(NULLIF(exp.palets, 0), exp.bultos)
-            WHEN pg.[in-out] = 'OUT' THEN ISNULL(NULLIF(palets, 0), bultos)
+            WHEN pg.agrupacion IS NOT NULL AND pg.[in-out] = 'OUT' THEN ${bultosEfectivos('exp.')}
+            WHEN pg.[in-out] = 'OUT' THEN ${bultosEfectivos()}
         END bultos,
         MAX(pcd.bulto) AS bultoscargados,
         pg.id as idplanigrid,

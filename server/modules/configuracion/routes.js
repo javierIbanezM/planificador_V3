@@ -64,12 +64,7 @@ router.get('/configuracion/automatizaciones.php', requireSessionFragment, (req, 
 
 // /api/configuracion.php — réplica de public/api/configuracion.php (solo
 // POST; cualquier otro método responde 405, igual que el original).
-router.all('/api/configuracion.php', (req, res, next) => {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-
+router.all('/api/configuracion.php', auth.requireLoginApi('No autenticado'), (req, res, next) => {
   if (req.method !== 'POST') {
     res.status(405).json({ status: 'error', mensaje: 'Método no permitido' });
     return;

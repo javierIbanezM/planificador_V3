@@ -28,12 +28,7 @@ router.get('/historico.php', auth.requireLogin('Planificador', `${appConfig.base
 });
 
 // POST /api/historico.php — réplica de public/api/historico.php.
-router.post('/api/historico.php', upload.none(), async (req, res) => {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-
+router.post('/api/historico.php', auth.requireLoginApi('No autenticado'), upload.none(), async (req, res) => {
   const funcion = String(req.body.funcion || '');
   const almacen = String(req.session.almacen || '');
   const todo = req.body.todo === '1' || req.body.todo === 'true';

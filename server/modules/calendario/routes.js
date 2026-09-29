@@ -28,12 +28,7 @@ router.get('/calendario.php', auth.requireLogin('Planificador', `${appConfig.bas
 });
 
 // POST /api/calendario.php — réplica de public/api/calendario.php.
-router.post('/api/calendario.php', upload.none(), async (req, res) => {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-
+router.post('/api/calendario.php', auth.requireLoginApi('No autenticado'), upload.none(), async (req, res) => {
   const funcion = String(req.body.funcion || '');
   const almacen = String(req.session.almacen || '');
   const fechaConsultada = String(req.body.fechaconsultada || '');

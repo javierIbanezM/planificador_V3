@@ -19,19 +19,6 @@ const router = express.Router();
 // controller.js#subirImagenes.
 const upload = multer({ storage: multer.memoryStorage() });
 
-/**
- * Réplica manual del guard `if(!Auth::check()){http_response_code(401);
- * echo json_encode(['status'=>'error','mensaje'=>'No autenticado']);exit;}`
- * presente al inicio de cada endpoint /api/cdmuelles/*.php original.
- */
-function requireAuthJson(req, res, next) {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-  next();
-}
-
 // Recursos estáticos del kiosco (lector de códigos de barras y PDF de
 // ayuda), servidos por public/cdmuelles/resources/**, referenciados por el
 // cliente con rutas relativas ("./resources/...", "./CheckCalidadAyuda.pdf")
@@ -97,7 +84,7 @@ router.get(
 const uploadNone = upload.none();
 
 // POST /api/cdmuelles/cargar-almacenes.php — réplica de public/api/cdmuelles/cargar-almacenes.php.
-router.post('/api/cdmuelles/cargar-almacenes.php', requireAuthJson, uploadNone, async (req, res, next) => {
+router.post('/api/cdmuelles/cargar-almacenes.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res, next) => {
   try {
     const almacenes = await controller.cargarAlmacenes();
     res.json({ status: 'success', almacenes });
@@ -107,7 +94,7 @@ router.post('/api/cdmuelles/cargar-almacenes.php', requireAuthJson, uploadNone, 
 });
 
 // POST /api/cdmuelles/cerrar-sesion.php — réplica de public/api/cdmuelles/cerrar-sesion.php.
-router.post('/api/cdmuelles/cerrar-sesion.php', requireAuthJson, uploadNone, async (req, res, next) => {
+router.post('/api/cdmuelles/cerrar-sesion.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res, next) => {
   try {
     res.json(await controller.cerrarSesion(req));
   } catch (err) {
@@ -116,7 +103,7 @@ router.post('/api/cdmuelles/cerrar-sesion.php', requireAuthJson, uploadNone, asy
 });
 
 // POST /api/cdmuelles/variable-sesion.php — réplica de public/api/cdmuelles/variable-sesion.php.
-router.post('/api/cdmuelles/variable-sesion.php', requireAuthJson, uploadNone, (req, res) => {
+router.post('/api/cdmuelles/variable-sesion.php', auth.requireLoginApi('No autenticado'), uploadNone, (req, res) => {
   const opcion = String(req.body.opcion || '');
   const valor = String(req.body.valor || '');
   res.json(controller.asignarVariableSesion(req, opcion, valor));
@@ -125,7 +112,7 @@ router.post('/api/cdmuelles/variable-sesion.php', requireAuthJson, uploadNone, (
 // POST /api/cdmuelles/subir-imagen.php — réplica de public/api/cdmuelles/subir-imagen.php.
 router.post(
   '/api/cdmuelles/subir-imagen.php',
-  requireAuthJson,
+  auth.requireLoginApi('No autenticado'),
   upload.array('image[]', 20),
   async (req, res, next) => {
     try {
@@ -147,7 +134,7 @@ router.post(
 );
 
 // POST /api/cdmuelles/mostrar-imagenes-orden.php — réplica de public/api/cdmuelles/mostrar-imagenes-orden.php.
-router.post('/api/cdmuelles/mostrar-imagenes-orden.php', requireAuthJson, uploadNone, async (req, res, next) => {
+router.post('/api/cdmuelles/mostrar-imagenes-orden.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res, next) => {
   try {
     const id = String(req.body.id || '');
     res.json(await controller.mostrarImagenesOrden(id));
@@ -157,7 +144,7 @@ router.post('/api/cdmuelles/mostrar-imagenes-orden.php', requireAuthJson, upload
 });
 
 // POST /api/cdmuelles/eliminar-foto.php — réplica de public/api/cdmuelles/eliminar-foto.php.
-router.post('/api/cdmuelles/eliminar-foto.php', requireAuthJson, uploadNone, async (req, res, next) => {
+router.post('/api/cdmuelles/eliminar-foto.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res, next) => {
   try {
     const idfoto = String(req.body.idfoto || '');
     const usuario = String(req.body.usuario || '');

@@ -18,128 +18,66 @@ const router = express.Router();
 // otros routers.
 const uploadNone = multer().none();
 
-/**
- * Endpoints del kiosco PDA Cdmuelles (estado de carga/descarga + impresión
- * de etiquetas). Réplica literal de public/api/cdmuelles/*.php: mismas
- * rutas (con ".php" literal), mismo Content-Type application/json y mismo
- * patrón de 401 JSON que el resto de endpoints /api/* ya migrados
- * (if(!Auth::check()){http_response_code(401);echo json_encode({status:
- * 'error', mensaje:'No autenticado'});exit;}).
- */
-function noAutenticado(req, res) {
-  res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-}
-
 // POST /api/cdmuelles/mostrar-muelles.php — réplica de public/api/cdmuelles/mostrar-muelles.php.
-router.post('/api/cdmuelles/mostrar-muelles.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/mostrar-muelles.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const almacen = String(req.body.almacen || '');
   res.json(await planigridController.mostrarMuelles(almacen));
 });
 
 // POST /api/cdmuelles/mostrar-tabla-ordenes.php — réplica de public/api/cdmuelles/mostrar-tabla-ordenes.php.
-router.post('/api/cdmuelles/mostrar-tabla-ordenes.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/mostrar-tabla-ordenes.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const almacen = String(req.body.almacen || '');
   const muelle = String(req.body.muelle || '');
   res.json(await planigridController.mostrarTablaOrdenes(almacen, muelle));
 });
 
 // POST /api/cdmuelles/consultar-estado.php — réplica de public/api/cdmuelles/consultar-estado.php.
-router.post('/api/cdmuelles/consultar-estado.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/consultar-estado.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   res.json(await planigridController.consultaEstado(id));
 });
 
 // POST /api/cdmuelles/cambiar-estado.php — réplica de public/api/cdmuelles/cambiar-estado.php.
-router.post('/api/cdmuelles/cambiar-estado.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/cambiar-estado.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const estado = String(req.body.estado || '');
   const id = String(req.body.id || '');
   res.json(await planigridController.cambiaEstado(estado, id));
 });
 
 // POST /api/cdmuelles/atras-estado.php — réplica de public/api/cdmuelles/atras-estado.php.
-router.post('/api/cdmuelles/atras-estado.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/atras-estado.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   const descripcion = String(req.body.descripcion || '');
   res.json(await planigridController.atrasEstadoCdmuelles(id, descripcion));
 });
 
 // POST /api/cdmuelles/entrar-orden1.php — réplica de public/api/cdmuelles/entrar-orden1.php.
-router.post('/api/cdmuelles/entrar-orden1.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/entrar-orden1.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   res.json(await planigridController.entrarOrden1(id));
 });
 
 // POST /api/cdmuelles/mostrar-albaranes.php — réplica de public/api/cdmuelles/mostrar-albaranes.php.
-router.post('/api/cdmuelles/mostrar-albaranes.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/mostrar-albaranes.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   res.json(await planigridController.mostrarAlbaranes(id));
 });
 
 // POST /api/cdmuelles/observaciones.php — réplica de public/api/cdmuelles/observaciones.php.
-router.post('/api/cdmuelles/observaciones.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/observaciones.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   res.json(await planigridController.observaciones(id));
 });
 
 // POST /api/cdmuelles/finalizar-carga.php — réplica de public/api/cdmuelles/finalizar-carga.php.
-router.post('/api/cdmuelles/finalizar-carga.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/finalizar-carga.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const usuario = String(req.body.usuario || req.session.usuario || '');
   res.json(await planigridController.finalizarCarga(idplanigrid, usuario));
 });
 
 // POST /api/cdmuelles/guardar-granel.php — réplica de public/api/cdmuelles/guardar-granel.php.
-router.post('/api/cdmuelles/guardar-granel.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/guardar-granel.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const granel = String(req.body.granel || '');
   const palets = req.body.palets !== undefined ? String(req.body.palets) : null;
@@ -147,23 +85,13 @@ router.post('/api/cdmuelles/guardar-granel.php', uploadNone, async (req, res) =>
 });
 
 // POST /api/cdmuelles/select-impresoras.php — réplica de public/api/cdmuelles/select-impresoras.php.
-router.post('/api/cdmuelles/select-impresoras.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/select-impresoras.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const almacen = String(req.session.almacen || '');
   res.json(await impresionController.selectImpresoras(almacen));
 });
 
 // POST /api/cdmuelles/imprimir-informes.php — réplica de public/api/cdmuelles/imprimir-informes.php.
-router.post('/api/cdmuelles/imprimir-informes.php', uploadNone, async (req, res) => {
-  if (!auth.check(req)) {
-    noAutenticado(req, res);
-    return;
-  }
-
+router.post('/api/cdmuelles/imprimir-informes.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const informe = String(req.body.informe || '');
   const impresora = req.body.impresora !== undefined ? String(req.body.impresora) : null;
   const almacen = String(req.body.almacen || req.session.almacen || '');

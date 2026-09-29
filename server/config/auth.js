@@ -23,11 +23,17 @@ function requireLogin(entorno, loginUrl = '/login.php') {
   };
 }
 
-/** Middleware para endpoints AJAX: responde 401 JSON si no hay sesión. */
-function requireLoginApi() {
+/**
+ * Middleware para endpoints AJAX: responde 401 JSON si no hay sesión.
+ * `mensaje` es configurable porque los distintos módulos, migrados en
+ * momentos distintos desde PHP, venían usando textos ligeramente distintos
+ * ("Sesión no iniciada." vs "No autenticado") — se parametriza para poder
+ * centralizar el guard sin cambiar el texto que cada endpoint ya devolvía.
+ */
+function requireLoginApi(mensaje = 'Sesión no iniciada.') {
   return (req, res, next) => {
     if (!check(req)) {
-      res.status(401).json({ status: 'error', mensaje: 'Sesión no iniciada.' });
+      res.status(401).json({ status: 'error', mensaje });
       return;
     }
     next();

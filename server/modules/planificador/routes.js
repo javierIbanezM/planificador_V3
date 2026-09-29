@@ -28,12 +28,7 @@ router.get('/planificador.php', auth.requireLogin('Planificador', `${appConfig.b
 });
 
 // POST /api/planificador.php — réplica de public/api/planificador.php.
-router.post('/api/planificador.php', upload.none(), async (req, res) => {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-
+router.post('/api/planificador.php', auth.requireLoginApi('No autenticado'), upload.none(), async (req, res) => {
   const funcion = String(req.body.funcion || '');
   const almacen = String(req.session.almacen || '');
 

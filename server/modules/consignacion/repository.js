@@ -1,6 +1,7 @@
 'use strict';
 
 const Repository = require('../../data/repository');
+const { bultosEfectivos } = require('../../data/sqlFragments');
 
 /**
  * Migrado de src/Modules/Consignacion/ConsignacionRepository.php (a su vez
@@ -58,7 +59,7 @@ class ConsignacionRepository extends Repository {
                     COUNT(bulto) as bultos
               FROM [Planificador].[dbo].[planigrid_cdmuelles]
               where idplanigrid = pg.id
-              GROUP BY idplanigrid), CASE WHEN pg.[in-out] = 'IN' THEN '' ELSE ' / ' END, SUM(ISNULL(NULLIF(epc.palets, 0), epc.bultos)))
+              GROUP BY idplanigrid), CASE WHEN pg.[in-out] = 'IN' THEN '' ELSE ' / ' END, SUM(${bultosEfectivos('epc.')}))
             as bultos,
             ecd.Estado as estadocdmuelles
             FROM planigrid AS pg
@@ -95,7 +96,7 @@ class ConsignacionRepository extends Repository {
             WHEN estado = 15 THEN 'Bloqueado'
             ELSE 'En Proceso' END as 'estado',
             playa,
-            CAST((ISNULL(COUNT(pcd.bulto),'')) as varchar)+'/'+CAST(ISNULL(ISNULL(NULLIF(palets, 0), bultos), '') as varchar) as bultos,
+            CAST((ISNULL(COUNT(pcd.bulto),'')) as varchar)+'/'+CAST(ISNULL(${bultosEfectivos()}, '') as varchar) as bultos,
             CASE
             WHEN [numSerieExpedicion] IS NULL THEN '0'
             ELSE [numSerieExpedicion] END as albaranenvio,

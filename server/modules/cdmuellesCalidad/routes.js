@@ -16,22 +16,12 @@ const router = express.Router();
 // stream de) peticiones que en realidad pertenecen a esos otros routers.
 const uploadNone = multer().none();
 
-// Réplica del guard `if (!Auth::check()) { http_response_code(401); ... }`
-// repetido en cada public/api/cdmuelles/*.php de Calidad/Expediciones.
-function requireAuthJson(req, res, next) {
-  if (!auth.check(req)) {
-    res.status(401).json({ status: 'error', mensaje: 'No autenticado' });
-    return;
-  }
-  next();
-}
-
 // ---------------------------------------------------------------------
 // Calidad (Quiz de calidad)
 // ---------------------------------------------------------------------
 
 // POST /api/cdmuelles/logs-sonda-manual.php
-router.post('/api/cdmuelles/logs-sonda-manual.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/logs-sonda-manual.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const pin = String(req.body.pin || '');
   const usuario = String(req.body.usuario || '');
   const idplanigrid = String(req.body.idplanigrid || '');
@@ -45,7 +35,7 @@ router.post('/api/cdmuelles/logs-sonda-manual.php', requireAuthJson, uploadNone,
 });
 
 // POST /api/cdmuelles/pin-jefe-sonda.php
-router.post('/api/cdmuelles/pin-jefe-sonda.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/pin-jefe-sonda.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const pin = String(req.body.pin || '');
   const usuario = String(req.body.usuario || '');
   const idplanigrid = String(req.body.idplanigrid || '');
@@ -54,7 +44,7 @@ router.post('/api/cdmuelles/pin-jefe-sonda.php', requireAuthJson, uploadNone, as
 });
 
 // POST /api/cdmuelles/pin-jefe.php
-router.post('/api/cdmuelles/pin-jefe.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/pin-jefe.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const pin = String(req.body.pin || '');
   const usuario = String(req.body.usuario || '');
   const idplanigrid = String(req.body.idplanigrid || '');
@@ -80,7 +70,7 @@ router.post('/api/cdmuelles/pin-jefe.php', requireAuthJson, uploadNone, async (r
 });
 
 // POST /api/cdmuelles/enviar-check.php
-router.post('/api/cdmuelles/enviar-check.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/enviar-check.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   const usuario = String(req.body.usuario || '');
 
@@ -102,7 +92,7 @@ router.post('/api/cdmuelles/enviar-check.php', requireAuthJson, uploadNone, asyn
 // ---------------------------------------------------------------------
 
 // POST /api/cdmuelles/contenedores-albaran.php
-router.post('/api/cdmuelles/contenedores-albaran.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/contenedores-albaran.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const albaran = String(req.body.albaran || '');
 
@@ -110,7 +100,7 @@ router.post('/api/cdmuelles/contenedores-albaran.php', requireAuthJson, uploadNo
 });
 
 // POST /api/cdmuelles/contenedores-verificados.php
-router.post('/api/cdmuelles/contenedores-verificados.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/contenedores-verificados.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const albaran = String(req.body.albaran || '');
 
@@ -118,7 +108,7 @@ router.post('/api/cdmuelles/contenedores-verificados.php', requireAuthJson, uplo
 });
 
 // POST /api/cdmuelles/incrementar-bultos.php
-router.post('/api/cdmuelles/incrementar-bultos.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/incrementar-bultos.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const albaran = String(req.body.albaran || '');
   const usuario = String(req.body.usuario || '');
@@ -129,7 +119,7 @@ router.post('/api/cdmuelles/incrementar-bultos.php', requireAuthJson, uploadNone
 });
 
 // POST /api/cdmuelles/decrementar-bultos.php
-router.post('/api/cdmuelles/decrementar-bultos.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/decrementar-bultos.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const albaran = String(req.body.albaran || '');
   const usuario = String(req.body.usuario || '');
@@ -138,7 +128,7 @@ router.post('/api/cdmuelles/decrementar-bultos.php', requireAuthJson, uploadNone
 });
 
 // POST /api/cdmuelles/quitar-contenedor.php
-router.post('/api/cdmuelles/quitar-contenedor.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/quitar-contenedor.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const idplanigrid = String(req.body.idplanigrid || '');
   const albaran = String(req.body.albaran || '');
   const usuario = String(req.body.usuario || '');
@@ -148,7 +138,7 @@ router.post('/api/cdmuelles/quitar-contenedor.php', requireAuthJson, uploadNone,
 });
 
 // POST /api/cdmuelles/select-ubicaciones.php
-router.post('/api/cdmuelles/select-ubicaciones.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/select-ubicaciones.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   const almacen = String(req.session.almacen || '');
 
@@ -156,7 +146,7 @@ router.post('/api/cdmuelles/select-ubicaciones.php', requireAuthJson, uploadNone
 });
 
 // POST /api/cdmuelles/enviar-datos-cdpq.php
-router.post('/api/cdmuelles/enviar-datos-cdpq.php', requireAuthJson, uploadNone, async (req, res) => {
+router.post('/api/cdmuelles/enviar-datos-cdpq.php', auth.requireLoginApi('No autenticado'), uploadNone, async (req, res) => {
   const id = String(req.body.id || '');
   const bultos = String(req.body.bultos || '');
   const usuario = String(req.body.usuario || '');

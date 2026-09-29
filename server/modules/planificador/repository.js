@@ -1,6 +1,7 @@
 'use strict';
 
 const Repository = require('../../data/repository');
+const { bultosEfectivos } = require('../../data/sqlFragments');
 
 /**
  * Modelo del módulo Planificador. Réplica de
@@ -65,11 +66,11 @@ FROM(
 	CONVERT(char(5), pg.fechallegada, 108) as h_llegada,
 	CASE
 		WHEN CASE
-				WHEN pg.[in-out] = 'OUT' THEN SUM(ISNULL(NULLIF(epc.palets, 0), epc.bultos))
+				WHEN pg.[in-out] = 'OUT' THEN SUM(${bultosEfectivos('epc.')})
 				WHEN pg.[in-out] = 'IN' THEN NULL
 			 END = 0 THEN NULL
 		ELSE CASE
-				WHEN pg.[in-out] = 'OUT' THEN SUM(ISNULL(NULLIF(epc.palets, 0), epc.bultos))
+				WHEN pg.[in-out] = 'OUT' THEN SUM(${bultosEfectivos('epc.')})
 				WHEN pg.[in-out] = 'IN' THEN NULL
 			 END
 	END as bultos,
