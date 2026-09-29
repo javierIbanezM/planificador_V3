@@ -351,9 +351,15 @@ class InformesController {
   // Etiqueta Genérica (playa) — GET /informes/etiqueta-generica.php
   // -----------------------------------------------------------------
 
-  async datosEtiquetaGenerica(id) {
+  /**
+   * @param {number} id idplanigrid
+   * @param {string|null} [albaran] Para un idplanigrid IN agrupado (varios
+   *   albaranes bajo la misma cabecera), limita los datos a ese albarán
+   *   concreto — ver pdfEtiquetaGenerica.
+   */
+  async datosEtiquetaGenerica(id, albaran = null) {
     const repo = await this.repository();
-    const fila = await repo.etiquetaGenericaData(id);
+    const fila = await repo.etiquetaGenericaData(id, albaran);
 
     const almacen = fila.almacen || '';
     const propietario = definido(fila.propietario) ? truncar(fila.propietario, 10) : '';
@@ -408,8 +414,27 @@ class InformesController {
     const paginas = [];
     let almacen = '';
     let referencia = '';
+    const repo = await this.repository();
 
     for (const id of idsPlanigrid) {
+      // Un idplanigrid IN puede agrupar varios albaranes (Agrupación de
+      // Preavisos): antes se imprimía una sola etiqueta con un albarán
+      // elegido al azar por el JOIN y se perdían los demás en silencio.
+      // Ahora, si hay más de uno, se genera una página por cada albarán.
+      // eslint-disable-next-line no-await-in-loop
+      const albaranes = await repo.etiquetaGenericaAlbaranes(id);
+
+      if (albaranes.length > 1) {
+        for (const albaran of albaranes) {
+          // eslint-disable-next-line no-await-in-loop
+          const datos = await this.datosEtiquetaGenerica(id, albaran);
+          paginas.push(datos);
+          almacen = datos.almacen;
+          referencia = datos.referencia;
+        }
+        continue;
+      }
+
       // eslint-disable-next-line no-await-in-loop
       const datos = await this.datosEtiquetaGenerica(id);
       paginas.push(datos);

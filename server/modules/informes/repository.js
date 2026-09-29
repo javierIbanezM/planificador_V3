@@ -424,12 +424,29 @@ GROUP BY albaran, pg.agrupacion, pg.id`,
   // Etiqueta Genérica / Etiqueta ROTIN
   // ---------------------------------------------------------------------
 
-  async etiquetaGenericaData(id) {
+  /**
+   * @param {number} id idplanigrid
+   * @param {string|null} [albaran] Cuando el idplanigrid es IN y agrupa
+   *   varios preavisos (varios albaranes bajo la misma cabecera), filtra a
+   *   un albarán concreto — así se puede pedir una fila por cada uno en vez
+   *   de que el JOIN con `preavisos` devuelva varias filas (una por
+   *   albarán) y `fetchOne` se quede solo con la primera, perdiendo el
+   *   resto en silencio (bug real: idplanigrid agrupado con 3 albaranes
+   *   imprimía una sola etiqueta con uno de los tres al azar).
+   */
+  async etiquetaGenericaData(id, albaran = null) {
     const fila = await this.fetchOne(
       `SELECT
 pg.almacen,
 pg.[in-out] as inout,
-pg.propietario,
+CASE
+    -- Cuando la cabecera agrupa varios preavisos (Agrupación de Preavisos),
+    -- pg.propietario es la CONCATENACIÓN de todos los propietarios del
+    -- grupo (lo calcula spAgrupaPreExp), no el de este albarán en
+    -- concreto: usar el propietario del propio preaviso filtrado.
+    WHEN pg.[in-out] = 'IN' AND pre.propietario IS NOT NULL THEN pre.propietario
+    ELSE pg.propietario
+END as propietario,
 CASE
     WHEN pg.[in-out] = 'IN' THEN pre.albaran
     ELSE pg.consignacion
@@ -479,8 +496,9 @@ LEFT JOIN muellesasignados  as mas ON mas.idplanigrid = pg.id
 LEFT JOIN expediciones as epc ON epc.idplanigrid = pg.id and epc.bultos IS not null
 
 
-WHERE pg.id = ?
+WHERE pg.id = ? AND (? IS NULL OR pre.albaran = ?)
 GROUP BY pg.propietario,
+pre.propietario,
 pg.almacen,
 pg.[in-out],
 pre.albaran,
@@ -495,9 +513,25 @@ pre.comentarioAlbaran,
 pg.fechafincd,
 pg.granel,
 pg.paletsaportados`,
-      [id]
+      [id, albaran, albaran]
     );
     return fila || {};
+  }
+
+  /**
+   * Albaranes distintos agrupados bajo un idplanigrid IN — para imprimir una
+   * etiqueta genérica por cada uno cuando hay varios (agrupación de
+   * preavisos), en vez de una sola para toda la cabecera.
+   */
+  async etiquetaGenericaAlbaranes(id) {
+    const filas = await this.fetchAll(
+      `SELECT DISTINCT pre.albaran
+       FROM preavisos as pre
+       WHERE pre.idplanigrid = ? AND pre.albaran IS NOT NULL
+       ORDER BY pre.albaran`,
+      [id]
+    );
+    return filas.map((f) => f.albaran);
   }
 
   async etiquetaRotinData(id) {

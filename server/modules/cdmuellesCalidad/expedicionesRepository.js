@@ -14,20 +14,20 @@ class ExpedicionesRepository extends Repository {
   }
 
   /**
-   * Propietario del albarán concreto (no de todo el pedido): cuando varios
-   * pedidos se agrupan en uno solo (planigrid.agrupacion), su propietario
-   * queda como la concatenación literal de los propietarios originales
-   * (p.ej. "00180107 head"), que no coincide con ninguna clave real de
-   * delivery-order-tokens.json — por eso fallaba la verificación de
-   * contenedores en pedidos agrupados. Cada fila de expediciones sí conserva
-   * el propietario correcto de su propio albarán, agrupado o no.
+   * Propietario y almacén del albarán concreto (no de todo el pedido):
+   * cuando varios pedidos se agrupan en uno solo (planigrid.agrupacion), su
+   * propietario queda como la concatenación literal de los propietarios
+   * originales (p.ej. "00180107 head"), que no es una clave válida para el
+   * API de contenedores — por eso fallaba la verificación en pedidos
+   * agrupados. Cada fila de expediciones sí conserva el propietario y
+   * almacén correctos de su propio albarán, agrupado o no.
    */
-  async propietario(idplanigrid, albaran) {
+  async propietarioYAlmacen(idplanigrid, albaran) {
     const fila = await this.fetchOne(
-      'SELECT propietario FROM expediciones WHERE idplanigrid = ? AND pedido = ?',
+      'SELECT propietario, almacen FROM expediciones WHERE idplanigrid = ? AND pedido = ?',
       [idplanigrid, albaran]
     );
-    return fila ? fila.propietario ?? null : null;
+    return fila ? { propietario: fila.propietario ?? null, almacen: fila.almacen ?? null } : null;
   }
 
   /**

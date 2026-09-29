@@ -152,24 +152,29 @@ class ExpedicionesController {
   }
 
   /**
-   * Contenedores esperados de un albarán, consultados al API de Whales
-   * (deliveryOrder) para verificarlos por escaneo en vez del +/- manual. Se
-   * marca cuáles ya están verificados (guardado en planigrid_cdmuelles,
-   * compartido entre dispositivos) para que abrir la misma C/D desde otro
-   * dispositivo no permita volver a escanear uno ya confirmado.
+   * Contenedores esperados de un albarán, consultados al API de contenedores
+   * (server/config/deliveryOrderApi.js) para verificarlos por escaneo en vez
+   * del +/- manual. Se marca cuáles ya están verificados (guardado en
+   * planigrid_cdmuelles, compartido entre dispositivos) para que abrir la
+   * misma C/D desde otro dispositivo no permita volver a escanear uno ya
+   * confirmado.
    */
   async contenedoresAlbaran(idplanigrid, albaran) {
     const repository = await this.repository();
-    const propietario = await repository.propietario(idplanigrid, albaran);
+    const datosPedido = await repository.propietarioYAlmacen(idplanigrid, albaran);
 
-    if (propietario === null) {
+    if (datosPedido === null) {
       return { status: 'error', message: 'No se encontró la C/D.' };
     }
 
     try {
-      let containers = await deliveryOrderApi.contenedoresDelPedido(propietario, albaran);
+      let containers = await deliveryOrderApi.contenedoresDelPedido(
+        datosPedido.propietario,
+        albaran,
+        datosPedido.almacen
+      );
 
-      // Whales devuelve una fila por cada línea de referencia dentro del
+      // El API devuelve una fila por cada línea de referencia dentro del
       // contenedor (un mismo contenedor/pallet puede llevar varias
       // referencias distintas), no una fila por contenedor físico. Se
       // deduplica aquí por "container" para que un único escaneo se pinte
