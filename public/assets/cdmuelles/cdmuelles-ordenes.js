@@ -716,7 +716,14 @@ function cargarContenedoresAlbaran(row) {
                 // (planigrid_cdmuelles.contenedor), compartido entre
                 // dispositivos: si ya lo escaneó otro terminal, aquí sale
                 // marcado en verde desde el principio.
-                const containers = data.containers.map(c => ({ container: c.container, verificado: !!c.verificado }));
+                // codigos trae todos los alias válidos para este bulto (p.ej.
+                // en SAGUNTO, el palet y cada contenedor que va dentro de él):
+                // escanear cualquiera de ellos verifica el bulto entero.
+                const containers = data.containers.map(c => ({
+                    container: c.container,
+                    codigos: Array.isArray(c.codigos) && c.codigos.length ? c.codigos : [c.container],
+                    verificado: !!c.verificado,
+                }));
                 row.setAttribute('data-containers', JSON.stringify(containers));
                 renderizarContenedores(row);
 
@@ -879,7 +886,7 @@ function verificarContenedorGlobal(input) {
 function buscarFilaConContenedorPendiente(filas, valor) {
     for (const row of filas) {
         const containers = JSON.parse(row.getAttribute('data-containers') || '[]');
-        if (containers.some(c => c.container === valor && !c.verificado)) {
+        if (containers.some(c => c.codigos.includes(valor) && !c.verificado)) {
             return row;
         }
     }
@@ -952,7 +959,7 @@ function confirmarEscaneoContenedorGlobal(input, filas, valor) {
 
 function registrarContenedorVerificado(filaCandidata, valor) {
     const containers = JSON.parse(filaCandidata.getAttribute('data-containers') || '[]');
-    const candidato = containers.find(c => c.container === valor && !c.verificado);
+    const candidato = containers.find(c => c.codigos.includes(valor) && !c.verificado);
     candidato.verificado = true;
     filaCandidata.setAttribute('data-containers', JSON.stringify(containers));
     // Al pintarse en su propia fila (renderizarContenedores/quitarContenedor
@@ -964,11 +971,13 @@ function registrarContenedorVerificado(filaCandidata, valor) {
 
     // Reutiliza el mismo mecanismo que el botón "+" (mismos efectos:
     // discrepancia, avance de estado a mitad de bultos, etc.) sin duplicar
-    // esa lógica aquí. Le pasamos el contenedor escaneado para que quede
-    // guardado en BD (planigrid_cdmuelles.contenedor) y así otro
-    // dispositivo que abra esta misma C/D lo vea ya verificado.
+    // esa lógica aquí. Se guarda siempre el código CANÓNICO del bulto
+    // (candidato.container), no el alias físico escaneado (valor): así,
+    // sea cual sea el contenedor/palet que se escanee de un mismo bulto, en
+    // BD (planigrid_cdmuelles.contenedor) y en otros dispositivos siempre
+    // se compara contra el mismo valor.
     const botonTemporal = document.createElement('button');
-    botonTemporal.setAttribute('data-contenedor', valor);
+    botonTemporal.setAttribute('data-contenedor', candidato.container);
     filaCandidata.appendChild(botonTemporal);
     incrementarBultos(botonTemporal);
     botonTemporal.remove();

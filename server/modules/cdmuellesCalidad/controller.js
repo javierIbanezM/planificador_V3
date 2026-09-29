@@ -174,19 +174,6 @@ class ExpedicionesController {
         datosPedido.almacen
       );
 
-      // El API devuelve una fila por cada línea de referencia dentro del
-      // contenedor (un mismo contenedor/pallet puede llevar varias
-      // referencias distintas), no una fila por contenedor físico. Se
-      // deduplica aquí por "container" para que un único escaneo se pinte
-      // una sola vez, en vez de una vez por línea.
-      const containersUnicos = new Map();
-      for (const c of containers) {
-        if (!containersUnicos.has(c.container)) {
-          containersUnicos.set(c.container, c);
-        }
-      }
-      containers = Array.from(containersUnicos.values());
-
       const verificadosFilas = await repository.contenedoresVerificados(idplanigrid, albaran);
       const verificados = verificadosFilas.map((fila) => fila.contenedor);
 

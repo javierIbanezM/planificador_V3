@@ -143,28 +143,60 @@ async function llamarProcConReintento(url, body, almacen) {
 }
 
 /**
- * Código que el operario debe escanear para cada línea, con prioridad según
- * el almacén: en SAGUNTO, "palet" si tiene dato, si no "contenedor"; en el
- * resto de almacenes, siempre "hu" (Handling Unit) — en SAGUNTO varias
- * líneas pueden compartir el mismo "contenedor" (id de expedición, no de
- * bulto físico), mientras que en el resto de almacenes "hu" es el que
- * identifica cada bulto.
+ * Agrupa las líneas del pedido por bulto físico y calcula, para cada bulto,
+ * todos los códigos válidos con los que se puede escanear.
+ *
+ * En SAGUNTO, un mismo palet puede llevar varios contenedores distintos
+ * (una línea por contenedor, todas con el mismo "pallet"): son el MISMO
+ * bulto, así que se agrupan bajo esa clave y se acumulan tanto el código de
+ * palet como el de cada contenedor asociado — escanear cualquiera de ellos
+ * verifica el bulto entero, y si ya está verificado, escanear otro alias del
+ * mismo grupo no debe contar como uno nuevo. Si la línea no tiene "pallet",
+ * el propio "contenedor" hace de clave (bulto de un solo código). Fuera de
+ * SAGUNTO se usa "hu" (Handling Unit), sin agrupar por palet.
  */
-function valorParaEscaneo(fila, almacen) {
-  if (almacen.trim().toUpperCase() === 'SAGUNTO') {
-    return fila.pallet || fila.contenedor || null;
+function agruparPorBulto(filas, almacen) {
+  const esSagunto = almacen.trim().toUpperCase() === 'SAGUNTO';
+  const grupos = new Map();
+
+  for (const fila of filas) {
+    let clave;
+    let codigosFila;
+
+    if (esSagunto && fila.pallet) {
+      clave = fila.pallet;
+      codigosFila = [fila.pallet, fila.contenedor].filter(Boolean);
+    } else if (esSagunto && fila.contenedor) {
+      clave = fila.contenedor;
+      codigosFila = [fila.contenedor];
+    } else if (!esSagunto && fila.hu) {
+      clave = fila.hu;
+      codigosFila = [fila.hu];
+    } else {
+      continue;
+    }
+
+    if (!grupos.has(clave)) {
+      grupos.set(clave, { container: clave, codigos: new Set() });
+    }
+    for (const codigo of codigosFila) {
+      grupos.get(clave).codigos.add(codigo);
+    }
   }
-  return fila.hu || null;
+
+  return Array.from(grupos.values()).map((grupo) => ({
+    container: grupo.container,
+    codigos: Array.from(grupo.codigos),
+  }));
 }
 
 /**
  * Consulta el pedido en el API de contenedores y devuelve la lista de
- * contenedores esperados. El código de escaneo elegido según el almacén
- * (ver valorParaEscaneo) se expone como "container" para no tener que tocar
- * el contrato ya usado por el frontend de CD Muelles
- * (cdmuelles-ordenes.js). Se descartan líneas sin ningún código válido y se
- * deduplica por ese código, ya que varias líneas de referencia pueden
- * compartir el mismo bulto.
+ * bultos esperados, uno por grupo de escaneo (ver agruparPorBulto). Cada
+ * bulto expone "container" (código canónico, el que se guarda en BD y se
+ * pinta en pantalla) y "codigos" (todos los alias válidos para marcarlo
+ * como escaneado) — contrato consumido por CD Muelles
+ * (cdmuelles-ordenes.js).
  */
 async function contenedoresDelPedido(propietario, pedido, almacen) {
   if (!almacen) {
@@ -193,9 +225,7 @@ async function contenedoresDelPedido(propietario, pedido, almacen) {
     almacen
   );
 
-  return contenedores
-    .map((c) => ({ ...c, container: valorParaEscaneo(c, almacen) }))
-    .filter((c) => c.container);
+  return agruparPorBulto(contenedores, almacen);
 }
 
 module.exports = { contenedoresDelPedido };
