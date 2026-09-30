@@ -144,32 +144,33 @@ async function llamarProcConReintento(url, body, almacen) {
 
 /**
  * Agrupa las líneas del pedido por bulto físico y calcula, para cada bulto,
- * todos los códigos válidos con los que se puede escanear.
+ * todos los códigos válidos con los que se puede escanear. Misma prioridad
+ * en todos los almacenes: "pallet" si tiene dato, si no "contenedor", si no
+ * "hu" (Handling Unit).
  *
- * En SAGUNTO, un mismo palet puede llevar varios contenedores distintos
- * (una línea por contenedor, todas con el mismo "pallet"): son el MISMO
- * bulto, así que se agrupan bajo esa clave y se acumulan tanto el código de
- * palet como el de cada contenedor asociado — escanear cualquiera de ellos
- * verifica el bulto entero, y si ya está verificado, escanear otro alias del
- * mismo grupo no debe contar como uno nuevo. Si la línea no tiene "pallet",
- * el propio "contenedor" hace de clave (bulto de un solo código). Fuera de
- * SAGUNTO se usa "hu" (Handling Unit), sin agrupar por palet.
+ * Un mismo palet puede llevar varios contenedores distintos (una línea por
+ * contenedor, todas con el mismo "pallet"): son el MISMO bulto, así que se
+ * agrupan bajo esa clave y se acumulan tanto el código de palet como el de
+ * cada contenedor asociado — escanear cualquiera de ellos verifica el bulto
+ * entero, y si ya está verificado, escanear otro alias del mismo grupo no
+ * debe contar como uno nuevo. Si la línea no tiene "pallet", el propio
+ * "contenedor" hace de clave; si tampoco tiene "contenedor", "hu" hace de
+ * clave (bulto de un solo código en ambos casos).
  */
-function agruparPorBulto(filas, almacen) {
-  const esSagunto = almacen.trim().toUpperCase() === 'SAGUNTO';
+function agruparPorBulto(filas) {
   const grupos = new Map();
 
   for (const fila of filas) {
     let clave;
     let codigosFila;
 
-    if (esSagunto && fila.pallet) {
+    if (fila.pallet) {
       clave = fila.pallet;
       codigosFila = [fila.pallet, fila.contenedor].filter(Boolean);
-    } else if (esSagunto && fila.contenedor) {
+    } else if (fila.contenedor) {
       clave = fila.contenedor;
       codigosFila = [fila.contenedor];
-    } else if (!esSagunto && fila.hu) {
+    } else if (fila.hu) {
       clave = fila.hu;
       codigosFila = [fila.hu];
     } else {
@@ -225,7 +226,7 @@ async function contenedoresDelPedido(propietario, pedido, almacen) {
     almacen
   );
 
-  return agruparPorBulto(contenedores, almacen);
+  return agruparPorBulto(contenedores);
 }
 
 module.exports = { contenedoresDelPedido };
