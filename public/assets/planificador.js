@@ -19,7 +19,49 @@ document.addEventListener('DOMContentLoaded', function () {
     cambioselector(selector.value);
   });
   actualizarTabla(page);
+  comprobarPosiblesReruteos();
 });
+
+// Aviso (no automático) de posibles OUT duplicados por cambio de ruta: un
+// pedido que ya se cargó y finalizó en un muelle, pero que al cambiar de
+// ruta en Whales genera una C/D nueva sin muelle asignado (ver análisis en
+// server/modules/planificador/repository.js, posiblesReruteos). Solo avisa;
+// la fusión, si corresponde, se hace a mano seleccionando ambas filas y
+// pulsando "Agrupar" (ya existente).
+function comprobarPosiblesReruteos() {
+  if (page !== 'Planificador') {
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('funcion', 'posiblesReruteos');
+  fetch(funcionesphp, { method: 'POST', body: formData })
+    .then(response => response.json())
+    .then(filas => {
+      const contenedor = document.getElementById('avisoReruteos');
+      if (!contenedor || !Array.isArray(filas) || filas.length === 0) {
+        return;
+      }
+
+      const items = filas.map(f =>
+        '<li>Pedido de <strong>' + f.propietario + '</strong> (' + f.transportista + '): '
+        + 'C/D <strong>' + f.idplanigridAntiguo + '</strong> (' + f.consignacionAntigua + ') ya finalizada en muelle '
+        + (f.muelleAntiguo || '?') + ' el ' + f.finalizadoEl + ', parece haberse re-rutado a la C/D nueva '
+        + '<strong>' + f.idplanigridNuevo + '</strong> (' + f.consignacionNueva + '), sin muelle asignado.</li>'
+      ).join('');
+
+      contenedor.innerHTML =
+        '<div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin:10px 0;">'
+        + '<strong>Posible' + (filas.length > 1 ? 's' : '') + ' carga' + (filas.length > 1 ? 's' : '') + ' duplicada' + (filas.length > 1 ? 's' : '') + ' por cambio de ruta:</strong>'
+        + ' revisa manualmente si corresponde (no uses "Agrupar" para estos casos, ver aviso del asistente).'
+        + '<ul style="margin:8px 0 0 0;">' + items + '</ul>'
+        + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+        + '</div>';
+    })
+    .catch(() => {
+      // Aviso best-effort: si falla la consulta, no bloquea el resto de la página.
+    });
+}
 
 function actualizartablas(page) {
   if (page === "Planificador") {

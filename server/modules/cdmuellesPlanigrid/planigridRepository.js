@@ -268,7 +268,7 @@ class PlanigridCdRepository extends Repository {
         exp.playa
         FROM planigrid as pg
         LEFT JOIN expediciones as exp ON exp.idplanigrid = pg.id
-        LEFT JOIN rutas as r ON r.consignacion = pg.consignacion and r.propietario = pg.consignacion
+        LEFT JOIN rutas as r ON r.consignacion = pg.consignacion and r.propietario = pg.propietario
         LEFT JOIN preavisos as pre ON pre.idplanigrid = pg.id
         WHERE pg.id = ?`;
 

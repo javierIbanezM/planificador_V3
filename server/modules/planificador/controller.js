@@ -37,6 +37,22 @@ class PlanificadorController {
     }));
   }
 
+  async posiblesReruteos(almacen) {
+    const repository = await this.repository();
+    const filas = await repository.posiblesReruteos(almacen);
+
+    return filas.map((fila) => ({
+      idplanigridNuevo: fila.idplanigridNuevo,
+      consignacionNueva: fila.consignacionNueva,
+      idplanigridAntiguo: fila.idplanigridAntiguo,
+      consignacionAntigua: fila.consignacionAntigua,
+      finalizadoEl: repository.formatearFecha(fila.finalizadoEl, 'd/m/Y H:i'),
+      muelleAntiguo: fila.muelleAntiguo,
+      propietario: fila.propietario,
+      transportista: fila.transportista,
+    }));
+  }
+
   async agruparcd(selectedRows, usuario) {
     const repository = await this.repository();
     const exito = await repository.agruparcd(selectedRows, usuario);

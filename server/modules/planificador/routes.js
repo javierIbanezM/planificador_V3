@@ -37,6 +37,10 @@ router.post('/api/planificador.php', auth.requireLoginApi('No autenticado'), upl
       res.json(await controller.planigrid(almacen));
       break;
 
+    case 'posiblesReruteos':
+      res.json(await controller.posiblesReruteos(almacen));
+      break;
+
     case 'agruparcd': {
       const selectedRows = String(req.body.selectedrows || '');
       const usuario = String(req.session.usuario || '');

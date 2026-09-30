@@ -162,6 +162,49 @@ ORDER BY drva.muelle DESC, drva.h_llegada DESC, drva.fecha_prevista ASC, drva.ho
 
     await this.execute('UPDATE planigrid SET prueba = ? WHERE id = ?', [observacion, padre.id]);
   }
+
+  /**
+   * Detecta posibles OUT duplicados por cambio de ruta: Whales genera un
+   * idExpPedidoCabecera nuevo al cambiar la ruta de un pedido (no renombra
+   * el antiguo), así que la importación lo trata como una carga totalmente
+   * nueva — aunque la carga original ya esté finalizada en un muelle. Se
+   * detecta por coincidencia de propietario+almacén+transportista+
+   * servicelevel+fechaprevista (con margen de unos segundos, ya que a veces
+   * llega con milisegundos distintos) entre un OUT recién creado (aún sin
+   * finalizar) y uno YA finalizado con consignación (ruta) distinta. Solo
+   * aviso: no toca nada, la fusión se hace a mano con "Agrupar" si procede.
+   */
+  async posiblesReruteos(almacen) {
+    const sqlText = `SELECT
+        nuevo.id AS idplanigridNuevo,
+        nuevo.consignacion AS consignacionNueva,
+        antiguo.id AS idplanigridAntiguo,
+        antiguo.consignacion AS consignacionAntigua,
+        antiguo.fechafinCD AS finalizadoEl,
+        ma.muelleasign AS muelleAntiguo,
+        nuevo.propietario,
+        nuevo.transportista
+    FROM planigrid AS nuevo
+    INNER JOIN planigrid AS antiguo
+        ON antiguo.propietario = nuevo.propietario
+        AND antiguo.almacen = nuevo.almacen
+        AND antiguo.transportista = nuevo.transportista
+        AND antiguo.servicelevel = nuevo.servicelevel
+        AND ABS(DATEDIFF(SECOND, antiguo.fechaprevista, nuevo.fechaprevista)) < 5
+        AND antiguo.[in-out] = 'OUT'
+        AND antiguo.id <> nuevo.id
+        AND antiguo.consignacion <> nuevo.consignacion
+    LEFT JOIN muellesasignados AS ma ON ma.idplanigrid = antiguo.id
+    WHERE nuevo.[in-out] = 'OUT'
+        AND nuevo.almacen = ?
+        AND nuevo.eliminado IS NULL
+        AND antiguo.eliminado IS NULL
+        AND nuevo.estadocdmuelles <> 7
+        AND antiguo.estadocdmuelles = 7
+    ORDER BY antiguo.fechafinCD DESC`;
+
+    return this.fetchAll(sqlText, [almacen]);
+  }
 }
 
 module.exports = PlanificadorRepository;
