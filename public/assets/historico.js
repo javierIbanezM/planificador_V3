@@ -75,7 +75,7 @@ function actualizartablas(page) {
               colorletraestadocarga = 'black';
               break;
           }
-          html += '<tr ondblclick="modal(\'consignacion\',this)" data-id="' + item.id + '" style="background:' + colorfondo + ';color:' + colorletras + ';">';
+          html += '<tr inout="' + item["in-out"] + '" ondblclick="modal(\'consignacion\',this)" data-id="' + item.id + '" style="background:' + colorfondo + ';color:' + colorletras + ';">';
           html += '<td class="tablaplaning">' + item.Tipo_de_carga + '</td>';
           html += '<td class="tablaplaning">' + item.propietario + '</td>';
           html += '<td class="tablaplaning">' + item.consignacion + '</td>';
@@ -105,6 +105,20 @@ function actualizartablas(page) {
   }
 }
 
+
+function filtrarPorTipo(tipo) {
+  var filas = document.querySelectorAll('#table-main tbody tr');
+
+  filas.forEach(function (fila) {
+    var inoutTipo = fila.getAttribute('inout');
+
+    if (inoutTipo === tipo) {
+      fila.style.display = '';
+    } else {
+      fila.style.display = 'none';
+    }
+  });
+}
 
 function filtrarRegistros(cantidad) {
   var filtros = [];
