@@ -221,8 +221,7 @@ class PlanigridCdRepository extends Repository {
         END as albaran,
         CASE
             WHEN pg.[in-out] = 'IN' THEN NULL
-            WHEN pg.agrupacion IS NOT NULL AND pg.[in-out] = 'OUT' THEN ${bultosEfectivos('exp.')}
-            WHEN pg.[in-out] = 'OUT' THEN ${bultosEfectivos()}
+            WHEN pg.[in-out] = 'OUT' THEN ${bultosEfectivos('exp.')}
         END bultos,
         MAX(pcd.bulto) AS bultoscargados,
         pg.id as idplanigrid,

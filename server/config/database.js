@@ -54,7 +54,10 @@ async function connection() {
   }
 
   const config = {
-    server: env.required('DB_HOST'),
+    // .trim(): DB_HOST en .env trae espacios al principio ("  SRVWhalesUAT...");
+    // sin quitarlos, getaddrinfo falla en seco (probado: falla con el
+    // espacio, resuelve bien sin él) en cualquier conexión nueva del pool.
+    server: env.required('DB_HOST').trim(),
     database: env.required('DB_NAME'),
     user: env.required('DB_USER'),
     password: env.required('DB_PASSWORD'),
