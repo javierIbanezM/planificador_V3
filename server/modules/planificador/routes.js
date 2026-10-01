@@ -41,6 +41,20 @@ router.post('/api/planificador.php', auth.requireLoginApi('No autenticado'), upl
       res.json(await controller.posiblesReruteos(almacen));
       break;
 
+    case 'fusionarReruteo': {
+      const idAntiguo = parseInt(req.body.idAntiguo, 10);
+      const idNuevo = parseInt(req.body.idNuevo, 10);
+      const usuario = String(req.session.usuario || '');
+
+      if (!Number.isInteger(idAntiguo) || !Number.isInteger(idNuevo)) {
+        res.status(400).json({ status: 'error', mensaje: 'idAntiguo/idNuevo inválidos' });
+        break;
+      }
+
+      res.json(await controller.fusionarReruteo(idAntiguo, idNuevo, usuario));
+      break;
+    }
+
     case 'agruparcd': {
       const selectedRows = String(req.body.selectedrows || '');
       const usuario = String(req.session.usuario || '');

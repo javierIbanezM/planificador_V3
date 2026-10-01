@@ -172,7 +172,9 @@ ORDER BY drva.muelle DESC, drva.h_llegada DESC, drva.fecha_prevista ASC, drva.ho
    * servicelevel+fechaprevista (con margen de unos segundos, ya que a veces
    * llega con milisegundos distintos) entre un OUT recién creado (aún sin
    * finalizar) y uno YA finalizado con consignación (ruta) distinta. Solo
-   * aviso: no toca nada, la fusión se hace a mano con "Agrupar" si procede.
+   * detecta: no toca nada por sí solo. La fusión (ver fusionarReruteo) la
+   * dispara un humano tras revisar el aviso — "Agrupar"/spAgrupaPreExp NO
+   * sirve aquí (crea un idplanigrid tercero y exige mismo muelle en ambos).
    */
   async posiblesReruteos(almacen) {
     const sqlText = `SELECT
@@ -204,6 +206,86 @@ ORDER BY drva.muelle DESC, drva.h_llegada DESC, drva.fecha_prevista ASC, drva.ho
     ORDER BY antiguo.fechafinCD DESC`;
 
     return this.fetchAll(sqlText, [almacen]);
+  }
+
+  /**
+   * Fusiona un reruteo detectado por posiblesReruteos: mueve a la C/D nueva
+   * todo el trabajo físico ya hecho en la antigua (fotos, bultos escaneados,
+   * respuestas del quiz de calidad) y copia su estado (finalización,
+   * observaciones, precinto, sonda...), en vez de usar spAgrupaPreExp (no
+   * sirve para este caso: crea un idplanigrid tercero y exige el mismo
+   * muelle en ambos). El muelle solo se mueve si la nueva aún no tiene uno
+   * asignado (si ya se asignó a mano, se respeta el suyo). La antigua queda
+   * retirada (eliminado=1), igual que spAgrupaPreExp retira los IDs que
+   * fusiona. Todo en una transacción: si algo falla, no se mueve nada.
+   */
+  async fusionarReruteo(idAntiguo, idNuevo, usuario) {
+    const antiguo = await this.fetchOne(
+      "SELECT * FROM planigrid WHERE id = ? AND [in-out] = 'OUT' AND eliminado IS NULL AND estadocdmuelles = 7",
+      [idAntiguo]
+    );
+    if (!antiguo) {
+      throw new Error('La C/D antigua no existe, no es OUT, no está finalizada, o ya fue retirada.');
+    }
+
+    const nuevo = await this.fetchOne(
+      "SELECT id FROM planigrid WHERE id = ? AND [in-out] = 'OUT' AND eliminado IS NULL",
+      [idNuevo]
+    );
+    if (!nuevo) {
+      throw new Error('La C/D nueva no existe, no es OUT, o ya fue retirada.');
+    }
+
+    const sqlText = `
+      BEGIN TRANSACTION;
+      BEGIN TRY
+        UPDATE planigrid_cdmuelles_uploads SET idplanigrid = ? WHERE idplanigrid = ?;
+        UPDATE planigrid_cdmuelles SET idplanigrid = ? WHERE idplanigrid = ?;
+        UPDATE planigrid_inf_data SET idplanigrid = ? WHERE idplanigrid = ?;
+
+        UPDATE planigrid
+        SET estadocdmuelles = ?, fechafinCD = ?, fechallegada = ?, observacioncdmuelles = ?,
+            observacioncdmuellesquizcalidad = ?, IncidenciaCheckCalidad = ?, precinto = ?,
+            sonda = ?, datalogger = ?, granel = ?, paletsaportados = ?, Palets = ?, fechainforme = ?
+        WHERE id = ?;
+
+        IF NOT EXISTS (SELECT 1 FROM muellesasignados WHERE idplanigrid = ?)
+          UPDATE muellesasignados SET idplanigrid = ? WHERE idplanigrid = ?;
+
+        UPDATE planigrid SET eliminado = 1 WHERE id = ?;
+
+        -- El historial de "Acciones en la Carga/Descarga" (modal consignación)
+        -- lee logs por referencia = idplanigrid: sin mover esto, el histórico
+        -- completo de la antigua desaparece de la vista (queda bajo un id
+        -- retirado que ya no se consulta en ningún listado).
+        UPDATE logs SET referencia = ? WHERE referencia = ? AND tiporeferencia = 'idplanigrid';
+
+        INSERT INTO logs (fecha, usuario, descripcion, instruccion, tiporeferencia, referencia)
+        VALUES (SYSDATETIME(), ?, ?, 'UPDATE', 'idplanigrid', ?);
+
+        COMMIT TRANSACTION;
+      END TRY
+      BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+      END CATCH`;
+
+    const descripcionLog = `Fusión por re-ruteo: trabajo de la C/D ${idAntiguo} (finalizada) movido aquí; ${idAntiguo} retirada.`;
+
+    await this.execute(sqlText, [
+      idNuevo, idAntiguo,
+      idNuevo, idAntiguo,
+      idNuevo, idAntiguo,
+      antiguo.estadocdmuelles, antiguo.fechafinCD, antiguo.fechallegada, antiguo.observacioncdmuelles,
+      antiguo.observacioncdmuellesquizcalidad, antiguo.IncidenciaCheckCalidad, antiguo.precinto,
+      antiguo.sonda, antiguo.datalogger, antiguo.granel, antiguo.paletsaportados, antiguo.Palets, antiguo.fechainforme,
+      idNuevo,
+      idNuevo,
+      idNuevo, idAntiguo,
+      idAntiguo,
+      idNuevo, idAntiguo,
+      usuario, descripcionLog, idNuevo,
+    ]);
   }
 }
 

@@ -26,8 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // pedido que ya se cargó y finalizó en un muelle, pero que al cambiar de
 // ruta en Whales genera una C/D nueva sin muelle asignado (ver análisis en
 // server/modules/planificador/repository.js, posiblesReruteos). Solo avisa;
-// la fusión, si corresponde, se hace a mano seleccionando ambas filas y
-// pulsando "Agrupar" (ya existente).
+// la fusión la dispara el botón (fusionarReruteo), que mueve fotos/bultos/
+// quiz de la antigua a la nueva y copia su estado — "Agrupar" NO sirve para
+// estos casos (crea un idplanigrid tercero y exige mismo muelle).
 function comprobarPosiblesReruteos() {
   if (page !== 'Planificador') {
     return;
@@ -47,19 +48,62 @@ function comprobarPosiblesReruteos() {
         '<li>Pedido de <strong>' + f.propietario + '</strong> (' + f.transportista + '): '
         + 'C/D <strong>' + f.idplanigridAntiguo + '</strong> (' + f.consignacionAntigua + ') ya finalizada en muelle '
         + (f.muelleAntiguo || '?') + ' el ' + f.finalizadoEl + ', parece haberse re-rutado a la C/D nueva '
-        + '<strong>' + f.idplanigridNuevo + '</strong> (' + f.consignacionNueva + '), sin muelle asignado.</li>'
+        + '<strong>' + f.idplanigridNuevo + '</strong> (' + f.consignacionNueva + '), sin muelle asignado. '
+        + '<button type="button" class="btn btn-sm btn-outline-danger" onclick="fusionarReruteo(' + f.idplanigridAntiguo + ', ' + f.idplanigridNuevo + ', this)">Mover fotos/bultos/quiz a la nueva</button>'
+        + '</li>'
       ).join('');
 
       contenedor.innerHTML =
         '<div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin:10px 0;">'
         + '<strong>Posible' + (filas.length > 1 ? 's' : '') + ' carga' + (filas.length > 1 ? 's' : '') + ' duplicada' + (filas.length > 1 ? 's' : '') + ' por cambio de ruta:</strong>'
-        + ' revisa manualmente si corresponde (no uses "Agrupar" para estos casos, ver aviso del asistente).'
+        + ' revisa si corresponde antes de pulsar — mueve el trabajo ya hecho (fotos, bultos escaneados, quiz de calidad) a la C/D nueva y retira la antigua.'
         + '<ul style="margin:8px 0 0 0;">' + items + '</ul>'
         + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
         + '</div>';
     })
     .catch(() => {
       // Aviso best-effort: si falla la consulta, no bloquea el resto de la página.
+    });
+}
+
+// Mueve a la C/D nueva el trabajo físico ya hecho en la antigua (fotos,
+// bultos escaneados, quiz de calidad) y copia su estado — ver
+// PlanificadorRepository.fusionarReruteo. Pide confirmación explícita antes
+// de escribir nada en BD; la antigua queda retirada (eliminado=1).
+function fusionarReruteo(idAntiguo, idNuevo, boton) {
+  const confirmado = confirm(
+    'Vas a mover a la C/D ' + idNuevo + ' las fotos, bultos escaneados y respuestas del quiz de calidad '
+    + 'de la C/D ' + idAntiguo + ' (ya finalizada), y copiar su estado. La C/D ' + idAntiguo + ' quedará retirada.\n\n'
+    + 'No se puede deshacer desde aquí. ¿Confirmas?'
+  );
+  if (!confirmado) {
+    return;
+  }
+
+  boton.disabled = true;
+  boton.textContent = 'Moviendo…';
+
+  const formData = new FormData();
+  formData.append('funcion', 'fusionarReruteo');
+  formData.append('idAntiguo', idAntiguo);
+  formData.append('idNuevo', idNuevo);
+
+  fetch(funcionesphp, { method: 'POST', body: formData })
+    .then(response => response.json())
+    .then(data => {
+      Notificacion(data.Notificacion, data.Asunto, data.Message);
+      if (data.status === 'success') {
+        boton.closest('li').remove();
+        actualizartablas(page);
+      } else {
+        boton.disabled = false;
+        boton.textContent = 'Mover fotos/bultos/quiz a la nueva';
+      }
+    })
+    .catch(() => {
+      Notificacion('Error', 'Error de conexión', 'No se pudo completar el movimiento.');
+      boton.disabled = false;
+      boton.textContent = 'Mover fotos/bultos/quiz a la nueva';
     });
 }
 

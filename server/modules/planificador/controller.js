@@ -53,6 +53,22 @@ class PlanificadorController {
     }));
   }
 
+  async fusionarReruteo(idAntiguo, idNuevo, usuario) {
+    const repository = await this.repository();
+
+    try {
+      await repository.fusionarReruteo(idAntiguo, idNuevo, usuario);
+      return {
+        status: 'success',
+        Notificacion: 'correcto',
+        Asunto: 'Fusión completada',
+        Message: `Se movió el trabajo (fotos, bultos, quiz) de la C/D ${idAntiguo} a la C/D ${idNuevo}.`,
+      };
+    } catch (err) {
+      return { status: 'error', Notificacion: 'error', Asunto: 'Error', Message: err.message };
+    }
+  }
+
   async agruparcd(selectedRows, usuario) {
     const repository = await this.repository();
     const exito = await repository.agruparcd(selectedRows, usuario);
