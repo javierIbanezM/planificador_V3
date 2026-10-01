@@ -410,6 +410,17 @@ class ConsignacionRepository extends Repository {
     ]);
   }
 
+  /**
+   * fechaFirmaDeca: segunda vía para dar por firmado el ADR, aparte de la
+   * tablet local ("Firma de peligrosidad ADR" en logs). Desde que el
+   * transporte firma el DECA por eCMR (Docuten, WhalesAza.expRutasDeca,
+   * estado='FIRMADO'), la tablet local lleva meses sin usarse — la firma
+   * del DECA cubre lo mismo (el conductor firma el documento de transporte,
+   * incluido el ADR) así que también debe desbloquear "dar salida". Se
+   * busca por idExpPedidoCabecera -> idRuta de CUALQUIER expedición de esta
+   * C/D (una C/D agrupada puede tener varias), quedándonos con la firma más
+   * reciente si hay más de una.
+   */
   async estadoParaAsignarSalida(idplanigrid) {
     const sql = `SELECT
           MIN(orden) as EstadoMin,
@@ -417,12 +428,21 @@ class ConsignacionRepository extends Repository {
           pg.estadocdmuelles,
           MAX(l.fecha) as fechafirmapeligrosidad,
           pg.peligrosidad,
-          pg.[in-out] as inout
+          pg.[in-out] as inout,
+          decafirma.fechaFirmaDeca
           FROM estados_cdmuelles as ecd
           LEFT JOIN planigrid as pg ON pg.id = ?
           LEFT JOIN logs as l ON l.referencia = pg.id and l.tiporeferencia = 'idplanigrid'
           AND l.descripcion = 'Firma de peligrosidad ADR'
-          GROUP BY pg.estadocdmuelles, pg.peligrosidad, pg.[in-out]`;
+          OUTER APPLY (
+              SELECT TOP 1 erd.fechaFirma as fechaFirmaDeca
+              FROM expediciones AS e
+              INNER JOIN [WhalesAza].[dbo].[expPedidoCabeceras] AS epc ON epc.idExpPedidoCabecera = e.idExpPedidoCabecera
+              INNER JOIN [WhalesAza].[dbo].[expRutasDeca] AS erd ON erd.idRuta = epc.idRuta AND erd.estado = 'FIRMADO'
+              WHERE e.idplanigrid = pg.id
+              ORDER BY erd.fechaFirma DESC
+          ) AS decafirma
+          GROUP BY pg.estadocdmuelles, pg.peligrosidad, pg.[in-out], decafirma.fechaFirmaDeca`;
 
     return this.fetchOne(sql, [idplanigrid]);
   }

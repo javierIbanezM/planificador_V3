@@ -132,8 +132,36 @@ ORDER BY CASE descripcion
     );
   }
 
+  /**
+   * Calculada EN VIVO desde expediciones/preavisos, no leída de
+   * planigrid.peligrosidad: ese campo solo se rellena una vez al crear la
+   * C/D (spAgrupaPlanigridExpediciones) y nunca se vuelve a recalcular si
+   * luego cambia la peligrosidad de algún pedido en Whales (confirmado:
+   * C/D 256422 seguía en BD como 'ADR' con sus 3 expediciones ya en NULL) —
+   * la sección ADR/LQ de la hoja de carga se quedaba pegada aunque la carga
+   * ya no tuviera nada peligroso. estado NOT IN (-3, 9): igual que el resto
+   * de consultas de expediciones activas, para no contar pedidos borrados o
+   * anulados.
+   */
   async peligrosidad(id) {
-    const fila = await this.fetchOne('SELECT peligrosidad FROM planigrid WHERE id = ?', [id]);
+    const fila = await this.fetchOne(
+      `SELECT
+          CASE
+              WHEN pg.[in-out] = 'OUT' THEN (
+                  SELECT dbo.fn_DistinctWords(STRING_AGG(e.peligrosidad, ' '))
+                  FROM expediciones AS e
+                  WHERE e.idplanigrid = pg.id AND e.estado NOT IN (-3, 9)
+              )
+              WHEN pg.[in-out] = 'IN' THEN (
+                  SELECT dbo.fn_DistinctWords(STRING_AGG(p.peligrosidad, ' '))
+                  FROM preavisos AS p
+                  WHERE p.idplanigrid = pg.id
+              )
+          END AS peligrosidad
+      FROM planigrid AS pg
+      WHERE pg.id = ?`,
+      [id]
+    );
     return fila && fila.peligrosidad !== undefined ? fila.peligrosidad : null;
   }
 

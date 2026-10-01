@@ -368,7 +368,12 @@ class ConsignacionController {
       };
     }
 
-    if ((result.peligrosidad ?? null) === 'ADR' && (result.fechafirmapeligrosidad ?? null) === null && (result.inout ?? null) === 'OUT') {
+    if (
+      (result.peligrosidad ?? null) === 'ADR' &&
+      (result.fechafirmapeligrosidad ?? null) === null &&
+      (result.fechaFirmaDeca ?? null) === null &&
+      (result.inout ?? null) === 'OUT'
+    ) {
       return {
         status: 'Error',
         Notificacion: 'error',
