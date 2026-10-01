@@ -120,6 +120,41 @@ class InformesController {
     return imagenes;
   }
 
+  /**
+   * Bloque de datos idéntico entre Hoja_Carga_1, Hoja_Carga_2 y
+   * Hoja_Descarga_1 (antes copiado 3 veces, una consulta `await` detrás de
+   * otra en cada copia). Son 9 lecturas de solo lectura, independientes
+   * entre sí para un mismo id — se lanzan en paralelo con Promise.all en vez
+   * de en cadena: mismo resultado, una sola tanda de latencia de red a BD en
+   * vez de la suma de las 9.
+   */
+  async datosComunesInforme(repo, id) {
+    const [finalizada, fechaRows, muelleRows, fechaLlegadaRows, checks, observacion, usuariosTiempo, galeria, peligrosidad] =
+      await Promise.all([
+        repo.finalizada(id),
+        repo.fechaInforme(id),
+        repo.muelleAsignado(id),
+        repo.fechaLlegada(id),
+        repo.checksCalidad(id),
+        repo.observacionCalidad(id),
+        repo.usuariosYTiempo(id),
+        this.construirGaleria(repo, id),
+        repo.peligrosidad(id),
+      ]);
+
+    return {
+      finalizada,
+      fecha: fechaRows.map((f) => repo.formatearFecha(f.fecha, 'd-m-Y') || '').join(''),
+      muelle: muelleRows.map((m) => (m.muelleasign !== null && m.muelleasign !== undefined ? m.muelleasign : '')).join(''),
+      fechaCarga: fechaLlegadaRows.map((f) => repo.formatearFecha(f.fechallegada, 'd-m-Y H:i') || '').join(''),
+      checks,
+      observacion,
+      usuariosTiempo,
+      galeria,
+      peligrosidad,
+    };
+  }
+
   // -----------------------------------------------------------------
   // Hoja de Carga (plantilla 1 / ED:04) — GET /informes/hoja-carga-1.php
   // -----------------------------------------------------------------
@@ -127,36 +162,26 @@ class InformesController {
   async datosHojaCarga1(id) {
     const repo = await this.repository();
 
-    const finalizada = await repo.finalizada(id);
-    const fechaRows = await repo.fechaInforme(id);
-    const fecha = fechaRows.map((f) => repo.formatearFecha(f.fecha, 'd-m-Y') || '').join('');
-    const muelleRows = await repo.muelleAsignado(id);
-    const muelle = muelleRows.map((m) => (m.muelleasign !== null && m.muelleasign !== undefined ? m.muelleasign : '')).join('');
-    const fechaLlegadaRows = await repo.fechaLlegada(id);
-    const fechaCarga = fechaLlegadaRows.map((f) => repo.formatearFecha(f.fechallegada, 'd-m-Y H:i') || '').join('');
-
-    const cabecera = await repo.cabeceraCarga1(id);
-    const temp = await repo.temperaturaCarga1(id);
-    const checks = await repo.checksCalidad(id);
-    const observacion = await repo.observacionCalidad(id);
-    const usuariosTiempo = await repo.usuariosYTiempo(id);
-    const pedidos = await repo.pedidosCargados(id);
-    const galeria = await this.construirGaleria(repo, id);
-    const peligrosidad = await repo.peligrosidad(id);
+    const [comunes, cabecera, temp, pedidos] = await Promise.all([
+      this.datosComunesInforme(repo, id),
+      repo.cabeceraCarga1(id),
+      repo.temperaturaCarga1(id),
+      repo.pedidosCargados(id),
+    ]);
     const adrLq = await this.construirBloqueAdrLq(
       repo,
       id,
-      peligrosidad,
+      comunes.peligrosidad,
       (i, p, s) => repo.filasSeccionCarga(i, p, s),
       true
     );
 
     return {
       imagenes: this.imagenesEstaticas(),
-      finalizada,
-      fecha,
-      muelle,
-      fechaCarga,
+      finalizada: comunes.finalizada,
+      fecha: comunes.fecha,
+      muelle: comunes.muelle,
+      fechaCarga: comunes.fechaCarga,
       numeroruta: cabecera.numeroruta || '',
       conductorNombre: cabecera.conductorNombre || '',
       conductorApellidos: cabecera.conductorApellidos || '',
@@ -172,13 +197,13 @@ class InformesController {
       rango: temp.rango || 'NO',
       tempmedida: definido(temp.value) ? temp.value : 'N/A',
       comparaciontemp: temp.comparacion_temp || 'N/A',
-      checks,
-      observacion: observacion.value || '',
-      operarios: usuariosTiempo.operarios || '',
-      fechainicio: repo.formatearFecha(usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
-      fechafincd: repo.formatearFecha(usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
+      checks: comunes.checks,
+      observacion: comunes.observacion.value || '',
+      operarios: comunes.usuariosTiempo.operarios || '',
+      fechainicio: repo.formatearFecha(comunes.usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
+      fechafincd: repo.formatearFecha(comunes.usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
       pedidos,
-      galeria,
+      galeria: comunes.galeria,
       adrLq,
       tituloColor: '#477CD0',
       cod: 'PSGC-06-F01',
@@ -200,36 +225,26 @@ class InformesController {
   async datosHojaCarga2(id) {
     const repo = await this.repository();
 
-    const finalizada = await repo.finalizada(id);
-    const fechaRows = await repo.fechaInforme(id);
-    const fecha = fechaRows.map((f) => repo.formatearFecha(f.fecha, 'd-m-Y') || '').join('');
-    const muelleRows = await repo.muelleAsignado(id);
-    const muelle = muelleRows.map((m) => (m.muelleasign !== null && m.muelleasign !== undefined ? m.muelleasign : '')).join('');
-    const fechaLlegadaRows = await repo.fechaLlegada(id);
-    const fechaCarga = fechaLlegadaRows.map((f) => repo.formatearFecha(f.fechallegada, 'd-m-Y H:i') || '').join('');
-
-    const cabecera = await repo.cabeceraCarga2(id);
-    const temp = await repo.temperaturaCarga1(id);
-    const checks = await repo.checksCalidad(id);
-    const observacion = await repo.observacionCalidad(id);
-    const usuariosTiempo = await repo.usuariosYTiempo(id);
-    const pedidos = await repo.pedidosCargados(id);
-    const galeria = await this.construirGaleria(repo, id);
-    const peligrosidad = await repo.peligrosidad(id);
+    const [comunes, cabecera, temp, pedidos] = await Promise.all([
+      this.datosComunesInforme(repo, id),
+      repo.cabeceraCarga2(id),
+      repo.temperaturaCarga1(id),
+      repo.pedidosCargados(id),
+    ]);
     const adrLq = await this.construirBloqueAdrLq(
       repo,
       id,
-      peligrosidad,
+      comunes.peligrosidad,
       (i, p, s) => repo.filasSeccionCarga(i, p, s),
       true
     );
 
     return {
       imagenes: this.imagenesEstaticas(),
-      finalizada,
-      fecha,
-      muelle,
-      fechaCarga,
+      finalizada: comunes.finalizada,
+      fecha: comunes.fecha,
+      muelle: comunes.muelle,
+      fechaCarga: comunes.fechaCarga,
       propietario: cabecera.propietario || '',
       consignacion: cabecera.consignacion || '',
       numeroruta: cabecera.numeroruta || '',
@@ -247,13 +262,13 @@ class InformesController {
       rango: temp.rango || 'NO',
       tempmedida: definido(temp.value) ? `${temp.value} ºC` : 'N/A',
       comparaciontemp: temp.comparacion_temp || 'N/A',
-      checks,
-      observacion: observacion.value || '',
-      operarios: usuariosTiempo.operarios || '',
-      fechainicio: repo.formatearFecha(usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
-      fechafincd: repo.formatearFecha(usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
+      checks: comunes.checks,
+      observacion: comunes.observacion.value || '',
+      operarios: comunes.usuariosTiempo.operarios || '',
+      fechainicio: repo.formatearFecha(comunes.usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
+      fechafincd: repo.formatearFecha(comunes.usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
       pedidos,
-      galeria,
+      galeria: comunes.galeria,
       adrLq,
       tituloColor: '#000000',
       cod: 'PSGC-06-F01',
@@ -275,26 +290,16 @@ class InformesController {
   async datosHojaDescarga1(id) {
     const repo = await this.repository();
 
-    const finalizada = await repo.finalizada(id);
-    const fechaRows = await repo.fechaInforme(id);
-    const fecha = fechaRows.map((f) => repo.formatearFecha(f.fecha, 'd-m-Y') || '').join('');
-    const muelleRows = await repo.muelleAsignado(id);
-    const muelle = muelleRows.map((m) => (m.muelleasign !== null && m.muelleasign !== undefined ? m.muelleasign : '')).join('');
-    const fechaLlegadaRows = await repo.fechaLlegada(id);
-    const fechaCarga = fechaLlegadaRows.map((f) => repo.formatearFecha(f.fechallegada, 'd-m-Y H:i') || '').join('');
-
-    const cabecera = await repo.cabeceraDescarga1(id);
-    const temp = await repo.temperaturaDescarga1(id);
-    const checks = await repo.checksCalidad(id);
-    const observacion = await repo.observacionCalidad(id);
-    const usuariosTiempo = await repo.usuariosYTiempo(id);
-    const bultosRows = await repo.bultosDescarga1(id);
-    const galeria = await this.construirGaleria(repo, id);
-    const peligrosidad = await repo.peligrosidad(id);
+    const [comunes, cabecera, temp, bultosRows] = await Promise.all([
+      this.datosComunesInforme(repo, id),
+      repo.cabeceraDescarga1(id),
+      repo.temperaturaDescarga1(id),
+      repo.bultosDescarga1(id),
+    ]);
     const adrLq = await this.construirBloqueAdrLq(
       repo,
       id,
-      peligrosidad,
+      comunes.peligrosidad,
       (i, p, s) => repo.filasSeccionDescarga(i, p, s),
       false
     );
@@ -309,10 +314,10 @@ class InformesController {
 
     return {
       imagenes: this.imagenesEstaticas(),
-      finalizada,
-      fecha,
-      muelle,
-      fechaCarga,
+      finalizada: comunes.finalizada,
+      fecha: comunes.fecha,
+      muelle: comunes.muelle,
+      fechaCarga: comunes.fechaCarga,
       propietario: cabecera.propietario || '',
       albaran: cabecera.albaran || '',
       nombre: cabecera.nombre || '',
@@ -329,14 +334,14 @@ class InformesController {
       rango: temp.rango || 'NO',
       tempmedida: definido(temp.value) ? temp.value : 'N/A',
       comparaciontemp: temp.comparacion_temp || 'N/A',
-      checks,
-      observacion: observacion.value || '',
-      operarios: usuariosTiempo.operarios || '',
-      fechainicio: repo.formatearFecha(usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
-      fechafincd: repo.formatearFecha(usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
+      checks: comunes.checks,
+      observacion: comunes.observacion.value || '',
+      operarios: comunes.usuariosTiempo.operarios || '',
+      fechainicio: repo.formatearFecha(comunes.usuariosTiempo.fechainicio, 'd-m-Y H:i') || '',
+      fechafincd: repo.formatearFecha(comunes.usuariosTiempo.fechafincd, 'd-m-Y H:i') || '',
       bultosRows,
       bultostotales,
-      galeria,
+      galeria: comunes.galeria,
       adrLq,
     };
   }
