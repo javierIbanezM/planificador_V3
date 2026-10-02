@@ -1163,7 +1163,7 @@ function Observaciones(idplanigridParam) {
             var html = '';
             html += '<strong>Matrícula Tractora: </strong>' + data[0].matriculatractora + '<br>';
             html += '<strong>Matrícula Remolque: </strong>' + data[0].matricularemolque + '<br>';
-            html += '<strong>Consignación: </strong>' + data[0].consignación + '<br>';
+            html += '<strong>Ruta: </strong>' + data[0].consignación + '<br>';
             html += '<strong>Observación Planificador:<a style="color:red">' + data[0].Observación_Planificador + '</strong></a><br>';
 
             data.forEach(item => {

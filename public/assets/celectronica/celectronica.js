@@ -79,7 +79,7 @@ function muelleseleccionado(html) {
                 var titulo = '<p style="font-size:160%" class="lead mb-0">Seleccionar Orden: </p>';
                 DivContenidoDinamico.innerHTML = titulo;
                 var html = `<table class="table table-bordered table-striped table-sm">
-                                    <th>Consignación</th>
+                                    <th>Ruta</th>
                                     <th>Peligrosidad</th>
                                     <tbody id="btabladatos">`;
                 data.forEach(item => {
