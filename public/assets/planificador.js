@@ -22,13 +22,16 @@ document.addEventListener('DOMContentLoaded', function () {
   comprobarPosiblesReruteos();
 });
 
-// Aviso (no automático) de posibles OUT duplicados por cambio de ruta: un
-// pedido que ya se cargó y finalizó en un muelle, pero que al cambiar de
-// ruta en Whales genera una C/D nueva sin muelle asignado (ver análisis en
-// server/modules/planificador/repository.js, posiblesReruteos). Solo avisa;
-// la fusión la dispara el botón (fusionarReruteo), que mueve fotos/bultos/
-// quiz de la antigua a la nueva y copia su estado — "Agrupar" NO sirve para
-// estos casos (crea un idplanigrid tercero y exige mismo muelle).
+// Posibles OUT duplicados por cambio de ruta: un pedido que ya se cargó y
+// finalizó en un muelle, pero que al cambiar de ruta en Whales genera una
+// C/D nueva sin muelle asignado (ver análisis en
+// server/modules/planificador/repository.js, posiblesReruteos). Ya no se
+// despliega solo: se muestra un botón con el número de avisos pendientes, y
+// al pulsarlo se abre/cierra la lista completa. La fusión la dispara el
+// botón de cada aviso (fusionarReruteo), que mueve fotos/bultos/quiz de la
+// antigua a la nueva y copia su estado — "Agrupar" NO sirve para estos casos
+// (crea un idplanigrid tercero y exige mismo muelle). Tras fusionar uno, el
+// contador baja solo y si no queda ninguno el botón desaparece.
 function comprobarPosiblesReruteos() {
   if (page !== 'Planificador') {
     return;
@@ -54,16 +57,25 @@ function comprobarPosiblesReruteos() {
       ).join('');
 
       contenedor.innerHTML =
-        '<div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin:10px 0;">'
-        + '<strong>Posible' + (filas.length > 1 ? 's' : '') + ' carga' + (filas.length > 1 ? 's' : '') + ' duplicada' + (filas.length > 1 ? 's' : '') + ' por cambio de ruta:</strong>'
-        + ' revisa si corresponde antes de pulsar — mueve el trabajo ya hecho (fotos, bultos escaneados, quiz de calidad) a la C/D nueva y retira la antigua.'
+        '<button type="button" class="btn btn-warning btn-sm" id="botonAvisoReruteos" onclick="toggleListaReruteos()" style="margin:10px 0;">'
+        + '⚠ Posibles cargas duplicadas por cambio de ruta (<span id="contadorReruteos">' + filas.length + '</span>)'
+        + '</button>'
+        + '<div id="listaReruteos" style="display:none;margin:8px 0;padding:10px;border:1px solid #ffc107;border-radius:4px;background:#fff8e6;">'
+        + 'Revisa si corresponde antes de pulsar — mueve el trabajo ya hecho (fotos, bultos escaneados, quiz de calidad) a la C/D nueva y retira la antigua.'
         + '<ul style="margin:8px 0 0 0;">' + items + '</ul>'
-        + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
         + '</div>';
     })
     .catch(() => {
       // Aviso best-effort: si falla la consulta, no bloquea el resto de la página.
     });
+}
+
+function toggleListaReruteos() {
+  const lista = document.getElementById('listaReruteos');
+  if (!lista) {
+    return;
+  }
+  lista.style.display = lista.style.display === 'none' ? 'block' : 'none';
 }
 
 // Mueve a la C/D nueva el trabajo físico ya hecho en la antigua (fotos,
@@ -94,6 +106,7 @@ function fusionarReruteo(idAntiguo, idNuevo, boton) {
       Notificacion(data.Notificacion, data.Asunto, data.Message);
       if (data.status === 'success') {
         boton.closest('li').remove();
+        actualizarContadorReruteos();
         actualizartablas(page);
       } else {
         boton.disabled = false;
@@ -105,6 +118,27 @@ function fusionarReruteo(idAntiguo, idNuevo, boton) {
       boton.disabled = false;
       boton.textContent = 'Mover fotos/bultos/quiz a la nueva';
     });
+}
+
+// Tras fusionar un aviso, baja el contador del botón; si no queda ninguno,
+// quita el botón y la lista enteros (ya no hay nada que mostrar).
+function actualizarContadorReruteos() {
+  const contenedor = document.getElementById('avisoReruteos');
+  const lista = document.getElementById('listaReruteos');
+  if (!contenedor || !lista) {
+    return;
+  }
+
+  const pendientes = lista.querySelectorAll('li').length;
+  if (pendientes === 0) {
+    contenedor.innerHTML = '';
+    return;
+  }
+
+  const span = document.getElementById('contadorReruteos');
+  if (span) {
+    span.textContent = pendientes;
+  }
 }
 
 function actualizartablas(page) {
